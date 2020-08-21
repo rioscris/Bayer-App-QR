@@ -6,14 +6,21 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   ScrollView,
   View,
   Text,
+  Button,
   StatusBar,
+  SafeAreaView,
+  TouchableOpacity,
+  NativeModules,
+  Alert,
+  Platform,
+  ActivityIndicator,
+  Flatlist
 } from 'react-native';
 
 import {
@@ -23,8 +30,13 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-
+const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const App: () => React$Node = () => {
+  const [devices, setDeviceArray] = useState([]);
+  const [loading, toggleLoading] = useState(false);
+  const [deviceType, setDeviceType] = useState('');
+
+  console.log(devices,loading,deviceType)
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -53,6 +65,59 @@ const App: () => React$Node = () => {
               </Text>
             </View>
           </View>
+          <View style={{padding:10,backgroundColor:Colors.white}}>
+            <Button
+              title={"Obtener datos del dispositivo"}
+              onPress={() => {
+                toggleLoading(true);
+                NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
+                  console.log("ENTRE?")
+                  setDeviceArray(res);
+                  setDeviceType('paired');                      //filter array for printers [class:1664]
+                  toggleLoading(false);
+                });
+              }}
+            ></Button>
+          </View>
+
+          {
+            devices.map((device) =>
+
+                <View style={{
+                  backgroundColor:Colors.white,
+                  flexDirection: 'column',
+                  padding: 20,
+                  justifyContent: 'center'
+                }}>
+                  <View style={{
+                    flex: 0.4
+                  }}>
+                    <Text>{device.name}</Text>
+                  </View>
+                  <View style={{
+                    flex: 0.3
+                  }}>
+                    <Text>{device.address}</Text>
+                  </View>
+                  {device.type != 'paired' &&
+                    <View style={{paddingTop:10}}>
+                      <Button
+                        title="Conectarme con el dispositivo"
+                        onClick={() => {
+                          NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res => alert(res));
+                        }}></Button>
+                    </View>}
+                    <View style={{paddingTop:10}}>
+                    <Button title={"Print something"}
+                      onPress={() => {
+                        NativeModules.RNZebraBluetoothPrinter.print(device.address,zpl).then((res) => {
+                          console.log(res)
+                        })
+                      }}
+                    />
+                    </View>
+                </View>
+              )}
         </ScrollView>
       </SafeAreaView>
     </>
