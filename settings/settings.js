@@ -8,24 +8,27 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from './action';
 const Settings = (props) => {
+
+    const {navigation} = props;
     const [devices, setDeviceArray] = useState([]);
     const [loading, toggleLoading] = useState(false);
     const [deviceType, setDeviceType] = useState('');
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        try {
-            const test = {name:"Luquiñasx3",macAdress:0}
-            const jsonTest = JSON.stringify(test);
-            AsyncStorage.setItem(
-                '@storage_print',
-                jsonTest
-            );
-            dispatch({type:UPDATE_STORAGE,payload:true})
-        } catch (error) {
-            Alert.alert(error)  
-        }
-    }, [])
+    // useEffect(() => {
+    //     try {
+    //         const test = {name:"Luquiñasx3",macAdress:0}
+    //         const jsonTest = JSON.stringify(test);
+    //         AsyncStorage.setItem(
+    //             '@storage_print',
+    //             jsonTest
+    //         );
+    //         dispatch({type:UPDATE_STORAGE,payload:true})
+    //     } catch (error) {
+    //         alert(error)  
+    //     }
+    // }, [])
+
     return (
         <ScrollView>
             <View>
@@ -45,7 +48,6 @@ const Settings = (props) => {
                 </View>
                 {
                     devices.map((device) =>
-
                         <View style={{
                             backgroundColor: Colors.white,
                             flexDirection: 'column',
@@ -62,29 +64,28 @@ const Settings = (props) => {
                             }}>
                                 <Text>{device.address}</Text>
                             </View>
-                            {device.type != 'paired' &&
                                 <View style={{ paddingTop: 10 }}>
                                     <Button
                                         title="Conectarme con el dispositivo"
                                         onClick={() => {
                                             NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res => {
-                                                Alert.alert(res)
                                                 const test = {name:device.name,macAdress:device.adress}
                                                 const jsonTest = JSON.stringify(test);
                                                 try {
                                                     AsyncStorage.setItem(
                                                         '@storage_print',
                                                         jsonTest
-                                                    );
-                                                    dispatch({type:UPDATE_STORAGE,payload:true})
+                                                        );
+                                                        dispatch({type:UPDATE_STORAGE,payload:true})
+                                                        alert("Se a conectado a la impresora con exito")
+                                                        navigation.navigate("Home")
                                                 } catch (error) {
-                                                    Alert.alert(error)
+                                                    alert("Se ha producido un error al querer conectarse con la impresora" + error)
                                                 }
                                             });
                                         }}
                                     />
                                 </View>
-                            }
                         </View>
                     )}
             </View>
