@@ -5,18 +5,23 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
+import { useDispatch } from 'react-redux';
+import { UPDATE_STORAGE } from './action';
 const Settings = (props) => {
     const [devices, setDeviceArray] = useState([]);
     const [loading, toggleLoading] = useState(false);
     const [deviceType, setDeviceType] = useState('');
+    const dispatch = useDispatch();
+
     useEffect(() => {
         try {
-            const test = {name:"Cris",macAdress:123}
+            const test = {name:"Luquiñasx3",macAdress:0}
             const jsonTest = JSON.stringify(test);
             AsyncStorage.setItem(
                 '@storage_print',
                 jsonTest
             );
+            dispatch({type:UPDATE_STORAGE,payload:true})
         } catch (error) {
             Alert.alert(error)  
         }
@@ -71,6 +76,7 @@ const Settings = (props) => {
                                                         '@storage_print',
                                                         jsonTest
                                                     );
+                                                    dispatch({type:UPDATE_STORAGE,payload:true})
                                                 } catch (error) {
                                                     Alert.alert(error)
                                                 }

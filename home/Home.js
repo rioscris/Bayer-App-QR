@@ -18,12 +18,17 @@ import {
     DebugInstructions,
     ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import useUpdateStorage from './hooks/useUpdateStorage';
+import { useDispatch } from 'react-redux';
+import { UPDATE_STORAGE } from '../settings/action';
 
 
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const Home = (props) => {
-    const [device,setDevice] = useState({name:"",macAdress:0});
     const { navigation } = props;
+    const [device, setDevice] = useState({ name: "", macAdress: 0 });
+    const dispatch = useDispatch();
+    const update = useUpdateStorage();
 
     useEffect(() => {
         try {
@@ -31,15 +36,21 @@ const Home = (props) => {
             if (jsonValue !== null) {
                 jsonValue.then((json) => {
                     const value = JSON.parse(json);
-                    if(value != null){
+                    if (value != null) {
                         setDevice(value)
                     }
                 })
+                if(update === true){
+                    dispatch({type:UPDATE_STORAGE,payload:false})
+                }
             }
-          } catch (error) {
-              alert(error)
-          }
-    },[])
+        } catch (error) {
+            alert(error)
+        }
+        return (() => {
+            setDevice({ name: "", macAdress: 0 })
+        })
+    }, [update])
 
     console.log(device)
 
@@ -50,36 +61,48 @@ const Home = (props) => {
                 <ScrollView
                     contentInsetAdjustmentBehavior="automatic"
                     style={styles.scrollView}>
-                    <View>
-                        {
-
-                        }
-                        <Text>
-                            
-                        </Text>
-                    </View>
                     <View style={styles.body}>
                         <View style={styles.sectionContainer}>
                             <Text style={styles.sectionTitle}>Bienvenido a aplicación eLector</Text>
                             <Text style={styles.sectionDescription}>
                                 Con esta aplicación podrá leer los códigos de barra de una etiqueta e imprimir los códigos QR correspondientes.
-              </Text>
+                            </Text>
                         </View>
                         <View style={styles.sectionContainer}>
                             <Text style={styles.sectionTitle}>Impresión</Text>
                             <Text style={styles.sectionDescription}>
                                 Las etiquetas saldran por vía Bluetooth a una impresora portatil.
-              </Text>
+                            </Text>
                         </View>
                         <View style={styles.sectionContainer}>
                             <Text style={styles.sectionTitle}>Validación</Text>
                             <Text style={styles.sectionDescription}>
                                 La aplicación permite leer el código QR generado, los códigos de barra de la etiqueta original y compararlos para verificar que se corresponden según la nomenclatura GS1.
-              </Text>
+                        </Text>
                         </View>
+                    </View>
+                    {/* esto hay que mejorarlo esticamente */}
+                    <View style={{backgroundColor:Colors.white}}> 
+                        {
+                            device.macAdress !== 0 ? <Text style={styles.sectionDescription}>
+                                Se encuentra conectado al siguiente dispositivo: {device.name} - {device.macAdress}
+                            </Text> : <Text styles={styles.sectionDescription}>
+                                    No se encuentra conectado a ningun dispositivo
+                            </Text>
+                        }
                     </View>
                     <View style={{ padding: 10, backgroundColor: Colors.white }}>
                         <Button title="Configuracion " onPress={() => navigation.navigate('Configuracion')} />
+                    <View style={{paddingTop:10}}>
+                    <Button title={"Print something"}
+                      onPress={() => {
+                        NativeModules.RNZebraBluetoothPrinter.print(device.macAdress,zpl).then((res) => {
+                          console.log(res)
+                        })
+                      }}
+                      disabled={device.macAdress === 0 ? true : false}
+                    />
+                    </View>
                     </View>
                 </ScrollView>
             </SafeAreaView>

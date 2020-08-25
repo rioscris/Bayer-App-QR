@@ -8,10 +8,16 @@
 
 import React, { useState } from 'react';
 import Navigation from './navigation/navigation';
+import { Provider } from 'react-redux';
+import configureStore from './storeConfig/configureStore';
+
+let store = configureStore();
 
 const App = (props) => {
   return (
+    <Provider store={store}>
       <Navigation />
+    </Provider>
   );
 };
 
