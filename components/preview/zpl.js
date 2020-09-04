@@ -5,10 +5,6 @@ export const generateQR = (pallet, lot) => {
 
     // const {matCode, lotNo, qty} = getLotFields(lot);
     // const pallet = 50000000001;
-    const matCode = 80108274;
-    const lot = 'ARACJ4';
-    const qty = 6720;
-
     // const zpl = 
     // `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
     // ^XA
