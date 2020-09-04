@@ -1,0 +1,1 @@
+export const UPDATE_STORAGE = 'UPDATE_STORAGE';
