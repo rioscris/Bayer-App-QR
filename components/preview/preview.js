@@ -21,7 +21,7 @@ const Preview = (props) => {
         Alert.alert('Imprimiendo...', 
             'Enviando datos a la impresora', 
             [{text: 'Continuar', onPress: () => {
-                NativeModules.RNZebraBluetoothPrinter.print(device.macAdress, generateQR(scanner.pallet, scanner.lot)).then((res) => {
+                NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, generateQR(scanner.pallet, scanner.lot)).then((res) => {
                     navigation.goBack()
                 }).catch(() => {
                     Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
