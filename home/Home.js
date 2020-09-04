@@ -1,32 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import {
-    StyleSheet,
-    ScrollView,
-    View,
-    Text,
-    Button,
-    StatusBar,
-    SafeAreaView,
-} from 'react-native';
-
 import AsyncStorage from '@react-native-community/async-storage';
-
+import React, { useEffect, useState } from 'react';
 import {
-    Header,
-    LearnMoreLinks,
-    Colors,
-    DebugInstructions,
-    ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import useUpdateStorage from './hooks/useUpdateStorage';
+    Button,
+    SafeAreaView, ScrollView,
+    StatusBar, StyleSheet,
+    Text, View, NativeModules
+} from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from '../settings/action';
+import useUpdateStorage from './hooks/useUpdateStorage';
+
+
 
 
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const Home = (props) => {
     const { navigation } = props;
-    const [device, setDevice] = useState({ name: "", macAdress: 0 });
+    const [device, setDevice] = useState({ name: "", macAddress: 0 });
     const dispatch = useDispatch();
     const update = useUpdateStorage();
 
@@ -48,7 +39,7 @@ const Home = (props) => {
             alert(error)
         }
         return (() => {
-            setDevice({ name: "", macAdress: 0 })
+            setDevice({ name: "", macAddress: 0 })
         })
     }, [update])
 
@@ -84,8 +75,8 @@ const Home = (props) => {
                     {/* esto hay que mejorarlo esticamente */}
                     <View style={{backgroundColor:Colors.white}}> 
                         {
-                            device.macAdress !== 0 ? <Text style={styles.sectionDescription}>
-                                Se encuentra conectado al siguiente dispositivo: {device.name} - {device.macAdress}
+                            device.macAddress !== 0 ? <Text style={styles.sectionDescription}>
+                                Se encuentra conectado al siguiente dispositivo: {device.name} - {device.macAddress}
                             </Text> : <Text styles={styles.sectionDescription}>
                                     No se encuentra conectado a ningun dispositivo
                             </Text>
@@ -96,11 +87,15 @@ const Home = (props) => {
                     <View style={{paddingTop:10}}>
                     <Button title={"Print something"}
                       onPress={() => {
-                        NativeModules.RNZebraBluetoothPrinter.print(device.macAdress,zpl).then((res) => {
-                          console.log(res)
-                        })
+                          try{
+                              NativeModules.RNZebraBluetoothPrinter.print(device.macAddress,zpl).then((res) => {
+                                console.log(res)
+                              })
+                            }catch(error) {
+                                alert("Se ha producido un error al querer imprimir, verifique que su impresora este encendida" + error)
+                            }
                       }}
-                      disabled={device.macAdress === 0 ? true : false}
+                      disabled={device.macAddress === 0 ? true : false}
                     />
                     </View>
                     </View>

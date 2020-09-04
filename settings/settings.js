@@ -9,25 +9,25 @@ import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from './action';
 const Settings = (props) => {
 
-    const {navigation} = props;
-    const [devices, setDeviceArray] = useState([]);
-    const [loading, toggleLoading] = useState(false);
-    const [deviceType, setDeviceType] = useState('');
+    const { navigation } = props;
+    const [devices, setDevices] = useState([]);
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     try {
-    //         const test = {name:"Luquiñasx3",macAdress:0}
-    //         const jsonTest = JSON.stringify(test);
-    //         AsyncStorage.setItem(
-    //             '@storage_print',
-    //             jsonTest
-    //         );
-    //         dispatch({type:UPDATE_STORAGE,payload:true})
-    //     } catch (error) {
-    //         alert(error)  
-    //     }
-    // }, [])
+    const selectedDevices = (address,name) => {
+        try {
+        const test = { name: name, macAddress: address }
+        const jsonTest = JSON.stringify(test);
+            AsyncStorage.setItem(
+                '@storage_print',
+                jsonTest
+            );
+            dispatch({ type: UPDATE_STORAGE, payload: true })
+            alert("Se a conectado a la impresora con exito")
+            navigation.navigate("Home")
+        } catch (error) {
+            alert("Se ha producido un error al querer conectarse con la impresora, verifique que el dispositivo se encuentra emparejado o encendido" + error)
+        }
+    }
 
     return (
         <ScrollView>
@@ -36,16 +36,15 @@ const Settings = (props) => {
                     <Button
                         title={"Listar dispositivos"}
                         onPress={() => {
-                            toggleLoading(true);
                             NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                                console.log("ENTRE?")
-                                setDeviceArray(res);
-                                setDeviceType('paired');                      //filter array for printers [class:1664]
-                                toggleLoading(false);
+                                setDevices(res);
                             });
                         }}
                     ></Button>
                 </View>
+                {devices.length > 0 && <View>
+                    <Text>Seleccione la impresora que va a utilizar para imprimir</Text>
+                </View>}
                 {
                     devices.map((device) =>
                         <View style={{
@@ -64,28 +63,12 @@ const Settings = (props) => {
                             }}>
                                 <Text>{device.address}</Text>
                             </View>
-                                <View style={{ paddingTop: 10 }}>
-                                    <Button
-                                        title="Conectarme con el dispositivo"
-                                        onClick={() => {
-                                            NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res => {
-                                                const test = {name:device.name,macAdress:device.adress}
-                                                const jsonTest = JSON.stringify(test);
-                                                try {
-                                                    AsyncStorage.setItem(
-                                                        '@storage_print',
-                                                        jsonTest
-                                                        );
-                                                        dispatch({type:UPDATE_STORAGE,payload:true})
-                                                        alert("Se a conectado a la impresora con exito")
-                                                        navigation.navigate("Home")
-                                                } catch (error) {
-                                                    alert("Se ha producido un error al querer conectarse con la impresora" + error)
-                                                }
-                                            });
-                                        }}
-                                    />
-                                </View>
+                            <View style={{ paddingTop: 10 }}>
+                                <Button
+                                    title="Conectarme con el dispositivo"
+                                    onPress={() => selectedDevices(device.address,device.name)}
+                                />
+                            </View>
                         </View>
                     )}
             </View>
