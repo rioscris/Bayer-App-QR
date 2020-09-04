@@ -2,22 +2,48 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
     Button,
-    SafeAreaView, ScrollView,
+    Image, SafeAreaView, ScrollView,
     StatusBar, StyleSheet,
     Text, View, NativeModules
 } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
-import { UPDATE_STORAGE } from '../settings/action';
+import { UPDATE_STORAGE } from '../components/settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
+
+
+
+const Presentation = () => (
+    <View style={styles.body}>
+        <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Bienvenido a aplicación eLector</Text>
+            <Text style={styles.sectionDescription}>
+                Con esta aplicación podrá leer los códigos de barra de una etiqueta e imprimir los códigos QR correspondientes.
+            </Text>
+        </View>
+        <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Impresión</Text>
+            <Text style={styles.sectionDescription}>
+                Las etiquetas saldran por vía Bluetooth a una impresora portatil.
+            </Text>
+        </View>
+        <View style={[styles.sectionContainer, {marginBottom: 20}]}>
+            <Text style={styles.sectionTitle}>Validación</Text>
+            <Text style={styles.sectionDescription}>
+                La aplicación permite leer el código QR generado, los códigos de barra de la etiqueta original y compararlos para verificar que se corresponden según la nomenclatura GS1.
+        </Text>
+        </View>
+    </View>
+)
 
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const Home = (props) => {
     const { navigation } = props;
-    const [device, setDevice] = useState({ name: "", macAddress: 0 });
+    const [device, setDevice] = useState({ name: "", macAdress: 0 });
     const dispatch = useDispatch();
     const update = useUpdateStorage();
-
+    const [debug, setDebug] = useState(false);
     useEffect(() => {
         try {
             const jsonValue = AsyncStorage.getItem('@storage_print');
@@ -36,7 +62,7 @@ const Home = (props) => {
             alert(error)
         }
         return (() => {
-            setDevice({ name: "", macAddress: 0 })
+            setDevice({ name: "", macAdress: 0 })
         })
     }, [update])
 
@@ -49,52 +75,31 @@ const Home = (props) => {
                 <ScrollView
                     contentInsetAdjustmentBehavior="automatic"
                     style={styles.scrollView}>
-                    <View style={styles.body}>
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>Bienvenido a aplicación eLector</Text>
-                            <Text style={styles.sectionDescription}>
-                                Con esta aplicación podrá leer los códigos de barra de una etiqueta e imprimir los códigos QR correspondientes.
-                            </Text>
-                        </View>
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>Impresión</Text>
-                            <Text style={styles.sectionDescription}>
-                                Las etiquetas saldran por vía Bluetooth a una impresora portatil.
-                            </Text>
-                        </View>
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>Validación</Text>
-                            <Text style={styles.sectionDescription}>
-                                La aplicación permite leer el código QR generado, los códigos de barra de la etiqueta original y compararlos para verificar que se corresponden según la nomenclatura GS1.
+                    <Presentation />
+                    <View style={{margin: 20}}> 
+                        <Text style={{fontSize: 20, width: "100%", padding: 10, color: Colors.white, borderRadius: 5, backgroundColor: device.macAdress !== 0 ? "#2DCC70" : "#d64040"}}>
+                            {device.macAdress !== 0 ? `Se encuentra conectado al siguiente dispositivo: ${device.name} - ${device.macAdress}` :
+                                `No se encuentra conectado a ningun dispositivo`}
                         </Text>
-                        </View>
-                    </View>
-                    {/* esto hay que mejorarlo esticamente */}
-                    <View style={{backgroundColor:Colors.white}}> 
-                        {
-                            device.macAddress !== 0 ? <Text style={styles.sectionDescription}>
-                                Se encuentra conectado al siguiente dispositivo: {device.name} - {device.macAddress}
-                            </Text> : <Text styles={styles.sectionDescription}>
-                                    No se encuentra conectado a ningun dispositivo
-                            </Text>
-                        }
                     </View>
                     <View style={{ padding: 10, backgroundColor: Colors.white }}>
                         <Button title="Configuracion " onPress={() => navigation.navigate('Configuracion')} />
-                    <View style={{paddingTop:10}}>
-                    <Button title={"Print something"}
-                      onPress={() => {
-                          try{
-                              NativeModules.RNZebraBluetoothPrinter.print(device.macAddress,zpl).then((res) => {
+                        <View style={{paddingTop:10, paddingBottom: 10}}>
+                            <Button title={"Print something"}
+                            onPress={() => {
+                                NativeModules.RNZebraBluetoothPrinter.print(device.macAdress,zpl).then((res) => {
                                 console.log(res)
-                              })
-                            }catch(error){
-                                alert("Se ha producido un error al querer imprimir, verifique que su impresora este encendida" + error)
-                            }
-                      }}
-                      disabled={device.macAddress === 0 ? true : false}
-                    />
+                                })
+                            }}
+                            disabled={device.macAdress === 0}
+                            />
+                        </View>
+                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner')} disabled={device.macAdress === 0 && !debug}/>
                     </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => setDebug(!debug)}>
+                            <Image style={styles.image} source={require('../images/patodebug.png')}/>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -106,6 +111,30 @@ const styles = StyleSheet.create({
     scrollView: {
         backgroundColor: Colors.lighter,
         marginBottom: 30,
+    },
+    buttonContainer: {
+        alignItems: "center", 
+        justifyContent: "center", 
+        // padding: 10,
+        flexDirection: "row",
+    },
+    button: {
+        // padding: 5, 
+        backgroundColor: '#f2f2f2', 
+        borderRadius: 50, 
+        elevation: 10, 
+        shadowColor: "#000", 
+        shadowOpacity: 1, 
+        shadowRadius: 5,
+        borderColor: '#fafafa', 
+        marginTop: 20, 
+        marginBottom: 20,
+        backgroundColor: 'white', 
+    },
+    image: {
+        width: 60, 
+        height: 60, 
+        margin: 10,
     },
     engine: {
         position: 'absolute',

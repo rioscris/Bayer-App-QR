@@ -12,7 +12,7 @@ import {
 import { RNCamera } from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 
-export default BarcodeScanner = (props) => {
+const BarcodeScanner = (props) => {
     const [torch, setTorch] = useState(false);
     const [barcode, setBarcode] = useState({});
     
@@ -111,3 +111,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
 })
+
+export default BarcodeScanner;
