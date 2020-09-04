@@ -8,28 +8,14 @@
 
 import React, { useState } from 'react';
 import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
   Button,
-  StatusBar,
-  SafeAreaView,
-  TouchableOpacity,
-  NativeModules,
-  Alert,
-  Platform,
-  ActivityIndicator,
-  Flatlist
+  NativeModules, SafeAreaView, ScrollView,
+  StatusBar, StyleSheet,
+  Text, View
 } from 'react-native';
+import { Colors, Header } from 'react-native/Libraries/NewAppScreen';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const App: () => React$Node = () => {
   const [devices, setDeviceArray] = useState([]);
@@ -39,7 +25,7 @@ const App: () => React$Node = () => {
   console.log(devices,loading,deviceType)
   return (
     <>
-      <StatusBar barStyle="dark-content" />
+    <StatusBar barStyle="dark-content" />
       <SafeAreaView>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
