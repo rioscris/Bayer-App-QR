@@ -40,7 +40,7 @@ const Presentation = () => (
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const Home = (props) => {
     const { navigation } = props;
-    const [device, setDevice] = useState({ name: "", macAdress: 0 });
+    const [device, setDevice] = useState({ name: "", macAddress: 0 });
     const dispatch = useDispatch();
     const update = useUpdateStorage();
     const [debug, setDebug] = useState(false);
@@ -62,11 +62,9 @@ const Home = (props) => {
             alert(error)
         }
         return (() => {
-            setDevice({ name: "", macAdress: 0 })
+            setDevice({ name: "", macAddress: 0 })
         })
     }, [update])
-
-    console.log(device)
 
     return (
         <>
@@ -77,8 +75,8 @@ const Home = (props) => {
                     style={styles.scrollView}>
                     <Presentation />
                     <View style={{margin: 20}}> 
-                        <Text style={{fontSize: 20, width: "100%", padding: 10, color: Colors.white, borderRadius: 5, backgroundColor: device.macAdress !== 0 ? "#2DCC70" : "#d64040"}}>
-                            {device.macAdress !== 0 ? `Se encuentra conectado al siguiente dispositivo: ${device.name} - ${device.macAdress}` :
+                        <Text style={{fontSize: 20, width: "100%", padding: 10, color: Colors.white, borderRadius: 5, backgroundColor: device.macAddress !== 0 ? "#2DCC70" : "#d64040"}}>
+                            {device.macAddress !== 0 ? `Se encuentra conectado al siguiente dispositivo: ${device.name} - ${device.macAddress}` :
                                 `No se encuentra conectado a ningun dispositivo`}
                         </Text>
                     </View>
@@ -87,14 +85,14 @@ const Home = (props) => {
                         <View style={{paddingTop:10, paddingBottom: 10}}>
                             <Button title={"Print something"}
                             onPress={() => {
-                                NativeModules.RNZebraBluetoothPrinter.print(device.macAdress,zpl).then((res) => {
+                                NativeModules.RNZebraBluetoothPrinter.print(device.macAddress,zpl).then((res) => {
                                 console.log(res)
                                 })
                             }}
-                            disabled={device.macAdress === 0}
+                            disabled={device.macAddress === 0}
                             />
                         </View>
-                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner')} disabled={device.macAdress === 0 && !debug}/>
+                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner')} disabled={device.macAddress === 0 && !debug}/>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={() => setDebug(!debug)}>
@@ -109,7 +107,7 @@ const Home = (props) => {
 
 const styles = StyleSheet.create({
     scrollView: {
-        backgroundColor: Colors.lighter,
+        backgroundColor: Colors.white,
         marginBottom: 30,
     },
     buttonContainer: {
