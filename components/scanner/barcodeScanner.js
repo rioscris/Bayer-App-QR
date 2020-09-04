@@ -11,15 +11,26 @@ import {
 
 import { RNCamera } from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
+import { useDispatch } from 'react-redux';
+import useScannerStorage from '../home/hooks/useScannerStorage';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import {SAVE_PALLET, SAVE_LOT} from './action'
+import { useFocusEffect } from '@react-navigation/native';
+import { FlashOff, FlashOn, Manual, Patodebug } from '../../images';
 
 const BarcodeScanner = (props) => {
     const [torch, setTorch] = useState(false);
-    const [barcode, setBarcode] = useState({});
-    
+    const { navigation } = props;
+    const dispatch = useDispatch();
+    const scannerStorage = useScannerStorage();
+    const [scanner, setScanner] = useState({pallet: null, lot: null});
     const frameWidthRel = 0.1;
     const frameHeightRel = 0.8;
     const [Screen, setScreen] = useState({w: Dimensions.get('screen').width, h: Dimensions.get('screen').height})
     const [mask, setMask] = useState({leftMargin: 0, topMargin: 0, frameWidth: 0, frameHeight: 0});
+    const defaultBarcodeTypes = [RNCamera.Constants.BarCodeType.code128]
+    const [isBarcodeRead, setIsBarcodeRead] = useState(false);
+    const [refresh, setRefresh] = useState(false);
     useEffect(() => {
         const totalFrameWidth = frameWidthRel * Screen.h;
         const totalFrameHeight = frameHeightRel * Screen.w;
@@ -30,6 +41,36 @@ const BarcodeScanner = (props) => {
             frameHeight: totalFrameHeight,
         })
     }, [Screen])
+
+    const onBarCodeRead = (barcode) => {
+        if(!isBarcodeRead){
+            setIsBarcodeRead(true);
+            if(scanner.pallet === null){
+                dispatch({type: SAVE_PALLET, payload: barcode.data});
+                setScanner({...scanner, pallet: barcode.data});
+            }
+            else if(scanner.lot === null){
+                dispatch({type: SAVE_LOT, payload: barcode.data});
+                setScanner({pallet: null, lot: null});
+                navigation.navigate('Preview');
+            }
+        }
+    }
+
+    useEffect(() => {
+        if(isBarcodeRead) setTimeout(() => setIsBarcodeRead(false), 3000)
+    }, [isBarcodeRead])
+
+    useFocusEffect(() => {
+        if(refresh){
+            setRefresh(false);
+            if(scannerStorage.pallet && !scannerStorage.lot) // Pallet has been entered
+                setScanner({pallet: scannerStorage.pallet, lot: null});
+            else if(!scannerStorage.pallet && !scannerStorage.lot) // Lot has been entered
+                setScanner({pallet: null, lot: null}); // Reset
+        }
+    }, [])
+
     return(
         <View style={styles.container}>
             <RNCamera
@@ -50,9 +91,10 @@ const BarcodeScanner = (props) => {
                     RNCamera.Constants.FlashMode.torch : 
                     RNCamera.Constants.FlashMode.off}
                 cameraViewDimensions={{width: Screen.w, height: Screen.h}}
-                onBarCodeRead={(barcode) => setBarcode(barcode)}
+                onBarCodeRead={(barcode) => onBarCodeRead(barcode)}
+                barCodeTypes={isBarcodeRead ? [] : defaultBarcodeTypes}
             >
-                <BarcodeMask edgeColor={'#62B1F6'} height={mask.frameWidth} width={mask.frameHeight}/>
+                <BarcodeMask edgeColor={'#b00000'} height={mask.frameWidth} width={mask.frameHeight}/>
                 {/* <View
                     style={{
                     position: 'absolute',
@@ -68,15 +110,31 @@ const BarcodeScanner = (props) => {
             </RNCamera>
             <View style={styles.bottomOverlay}>
                 <TouchableOpacity onPress={() => setTorch(!torch)}>
-                    <Image style={styles.cameraIcon} source={torch ? require('../images/flash_off.png') : require('../images/flash_on.png')}/>
+                    <Image style={styles.cameraIcon} source={torch ? FlashOff : FlashOn}/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                        setRefresh(true);
+                        navigation.navigate('Manual');
+                    }}>
+                    <Image style={styles.cameraIcon} source={Manual}/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                        onBarCodeRead({data: scanner.pallet === null ? '1234' : '12345678ABCDEF1234'}); // Inserts test data
+                    }}>
+                    <Image style={styles.cameraIcon} source={Patodebug}/>
                 </TouchableOpacity>
             </View>
-            <View style={styles.lowerSection}>
-                <TextInput
-                    editable={false}
-                    placeholder='Código'
-                    value={barcode.data}
-                />
+            <View style={{bottom: 0, position: 'absolute', width: '100%', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                <View style={styles.instruction}>
+                    <Text style={styles.instructionText}>
+                        {scanner.pallet === null ? '' : `Valor Leido ${scanner.pallet}`}
+                    </Text>
+                </View>
+                <View style={styles.instruction}>
+                    <Text style={styles.instructionText}>
+                        {scanner.pallet === null ? "Escanee el Pallet" : "Escanee el lote"}
+                    </Text>
+                </View>
             </View>
         </View>
     )
@@ -94,22 +152,30 @@ const styles = StyleSheet.create({
     },
     cameraIcon: {
         margin: 5,
-        height: 40,
-        width: 40
+        height: 50,
+        width: 50,
     },
     bottomOverlay: {
         position: "absolute",
+        marginTop: 5,
         width: "100%",
         flex: 20,
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
     },
-    lowerSection: {
-        position: "absolute",
-        width: "100%",
-        bottom: 0,
-        backgroundColor: 'white',
+    instruction: {
+        height: 40,
+        justifyContent: "center",
+        color: Colors.white,
+        borderRadius: 10,
+        margin: 10,
     },
+    instructionText: {
+        textAlign: "center",
+        fontFamily: "Helvetica, Arial, sans-serif;",
+        color: Colors.white,
+        fontSize: 20,
+    }
 })
 
 export default BarcodeScanner;

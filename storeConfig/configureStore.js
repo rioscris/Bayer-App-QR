@@ -1,8 +1,10 @@
 import {createStore,combineReducers} from 'redux'
-import settingsReducer from '../settings/reducer'
+import settingsReducer from '../components/settings/reducer'
+import scannerReducer from '../components/scanner/reducer'
 
 const rootReducer = combineReducers({
     settings: settingsReducer,
+    scanner: scannerReducer,
 })
 
 const configureStore = () => {

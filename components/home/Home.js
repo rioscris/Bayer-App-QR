@@ -9,10 +9,9 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
-import { UPDATE_STORAGE } from '../components/settings/action';
+import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
-import { Patodebug } from '../images';
-
+import Patodebug from '../../images/patodebug.png';
 
 
 const Presentation = () => (
@@ -66,6 +65,8 @@ const Home = (props) => {
             setDevice({ name: "", macAdress: 0 })
         })
     }, [update])
+
+    console.log(device)
 
     return (
         <>
