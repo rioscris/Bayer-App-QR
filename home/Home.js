@@ -11,9 +11,6 @@ import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
 
-
-
-
 const zpl = "^XA^FX^CF0,60^FO220,50^FDHello world^FS^XZ";
 const Home = (props) => {
     const { navigation } = props;
@@ -91,7 +88,7 @@ const Home = (props) => {
                               NativeModules.RNZebraBluetoothPrinter.print(device.macAddress,zpl).then((res) => {
                                 console.log(res)
                               })
-                            }catch(error) {
+                            }catch(error){
                                 alert("Se ha producido un error al querer imprimir, verifique que su impresora este encendida" + error)
                             }
                       }}

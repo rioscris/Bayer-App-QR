@@ -23,7 +23,7 @@ const Settings = (props) => {
             );
             dispatch({ type: UPDATE_STORAGE, payload: true })
             alert("Se a conectado a la impresora con exito")
-            navigation.navigate("Home")
+            navigation.goBack();
         } catch (error) {
             alert("Se ha producido un error al querer conectarse con la impresora, verifique que el dispositivo se encuentra emparejado o encendido" + error)
         }
