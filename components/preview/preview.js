@@ -15,13 +15,25 @@ const Preview = (props) => {
     const { navigation } = props;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
+    const zpl = 
+    `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
+    ^XA
+    ^MMT
+    ^PW799
+    ^LL0519
+    ^LS0
+    
+    ^BY198,198^FT435,385^BXN,9,200,0,0,1,~
+    ^FH\\^FD\\7E19250000000001\\7E124080108274\\7E110ARACJ4\\7E1376720^FS
+    ^PQ1,0,1,Y^XZ
+    `;
     const print = () => {
         dispatch({type: SCAN_CLEAR});
         setPrinting(true);
         Alert.alert('Imprimiendo...', 
             'Enviando datos a la impresora', 
             [{text: 'Continuar', onPress: () => {
-                NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, generateQR(scanner.pallet, scanner.lot)).then((res) => {
+                NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
                     navigation.goBack()
                 }).catch(() => {
                     Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
