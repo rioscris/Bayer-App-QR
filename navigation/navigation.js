@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import Settings from '../components/settings/settings'
 import Home from '../components/home/Home'
-import BarcodeScanner from '../components/scanner/barcodeScanner'
+import BarcodeScanner from '../components/scanner/barcode/barcodeScanner'
 import Preview from '../components/preview/preview';
 import Manual from '../components/manual/manual';
 

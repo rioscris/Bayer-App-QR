@@ -12,15 +12,15 @@ import {
 import { RNCamera } from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import { useDispatch } from 'react-redux';
-import useScannerStorage from '../home/hooks/useScannerStorage';
+import useScannerStorage from '../../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import {SAVE_PALLET, SAVE_LOT} from './action'
+import {SAVE_PALLET, SAVE_LOT} from '../action'
 import { useFocusEffect } from '@react-navigation/native';
-import { FlashOff, FlashOn, Manual, Patodebug } from '../../images';
+import { FlashOff, FlashOn, Manual, Patodebug } from '../../../images';
 
-const BarcodeScanner = (props) => {
+const BarcodeScanner = ({navigation,route}) => {
     const [torch, setTorch] = useState(false);
-    const { navigation } = props;
+    const { validate } = route.params;
     const dispatch = useDispatch();
     const scannerStorage = useScannerStorage();
     const [scanner, setScanner] = useState({pallet: null, lot: null});
@@ -31,6 +31,9 @@ const BarcodeScanner = (props) => {
     const defaultBarcodeTypes = [RNCamera.Constants.BarCodeType.code128]
     const [isBarcodeRead, setIsBarcodeRead] = useState(false);
     const [refresh, setRefresh] = useState(false);
+
+    console.log(validate)
+
     useEffect(() => {
         const totalFrameWidth = frameWidthRel * Screen.h;
         const totalFrameHeight = frameHeightRel * Screen.w;
@@ -52,7 +55,7 @@ const BarcodeScanner = (props) => {
             else if(scanner.lot === null){
                 dispatch({type: SAVE_LOT, payload: barcode.data});
                 setScanner({pallet: null, lot: null});
-                navigation.navigate('Preview');
+                navigation.navigate('Preview',{validate:validate});
             }
         }
     }
