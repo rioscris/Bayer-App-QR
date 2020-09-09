@@ -92,8 +92,9 @@ const Home = (props) => {
                             disabled={device.macAddress === 0}
                             />
                         </View>
-                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner',{validate:false})} disabled={device.macAddress === 0 && !debug}/>
-                        <Button title="Validar" onPress={() => navigation.navigate('Scanner',{validate:true})} disabled={device.macAddress === 0 && !debug}/>
+                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner',{validate:false,type:"barcode"})} disabled={device.macAddress === 0 && !debug}/>
+                        <Button title="Validar" onPress={() => navigation.navigate('Scanner',{validate:true,type:"barcode"})} disabled={device.macAddress === 0 && !debug}/>
+                        <Button title="Verificar inputs" onPress={() => navigation.navigate('Verify')} disabled={device.macAddress === 0 && !debug}/>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={() => setDebug(!debug)}>

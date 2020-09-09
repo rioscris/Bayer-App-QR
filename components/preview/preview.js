@@ -15,7 +15,6 @@ const Preview = ({ navigation, route }) => {
     const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    console.log(validate)
     const zpl =
         `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
     ^XA
@@ -114,7 +113,7 @@ const Preview = ({ navigation, route }) => {
                             <Image style={styles.image} source={Patodebug} />
                         </TouchableOpacity>
                     </View>
-                        : <Button title={"Validar con QR"} />}
+                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner",{validate:false,type:"qr"})}/>}
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
         </View>
