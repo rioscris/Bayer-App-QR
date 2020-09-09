@@ -38,16 +38,16 @@ const Preview = (props) => {
         );
     }
     const printDebug = () => {
-        console.log('zpl is \n' + zpl); // para lucas: probar si esto funca bien
-        // setPrinting(true);
-        // dispatch({type: SCAN_CLEAR});
-        // Alert.alert('Imprimiendo...', 
-        //     'Enviando datos a la impresora', 
-        //     [{text: 'Continuar', onPress: () => {
-        //         navigation.goBack();
-        //         setPrinting(false);
-        //     }}]
-        // );
+        // console.log('zpl is \n' + zpl); // para lucas: probar si esto funca bien
+        setPrinting(true);
+        dispatch({type: SCAN_CLEAR});
+        Alert.alert('Imprimiendo...', 
+            'Enviando datos a la impresora', 
+            [{text: 'Continuar', onPress: () => {
+                navigation.goBack();
+                setPrinting(false);
+            }}]
+        );
     }
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {

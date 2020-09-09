@@ -119,7 +119,7 @@ const BarcodeScanner = (props) => {
                     <Image style={styles.cameraIcon} source={Manual}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
-                        onBarCodeRead({data: scanner.pallet === null ? '1234' : '12345678  ABCDEF  1234'}); // Inserts test data
+                        onBarCodeRead({data: scanner.pallet === null ? '50000000001' : '12345678ABCDEF1234'}); // Inserts test data
                     }}>
                     <Image style={styles.cameraIcon} source={Patodebug}/>
                 </TouchableOpacity>
