@@ -14,7 +14,7 @@ import BarcodeMask from 'react-native-barcode-mask';
 import { useDispatch } from 'react-redux';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import {SAVE_PALLET, SAVE_LOT} from './action'
+import {SAVE_PALLET, SAVE_LOT_AUTO} from './action'
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashOff, FlashOn, Manual, Patodebug } from '../../images';
 
@@ -50,7 +50,7 @@ const BarcodeScanner = (props) => {
                 setScanner({...scanner, pallet: barcode.data});
             }
             else if(scanner.lot === null){
-                dispatch({type: SAVE_LOT, payload: barcode.data});
+                dispatch({type: SAVE_LOT_AUTO, payload: barcode.data});
                 setScanner({pallet: null, lot: null});
                 navigation.navigate('Preview');
             }
@@ -119,7 +119,7 @@ const BarcodeScanner = (props) => {
                     <Image style={styles.cameraIcon} source={Manual}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
-                        onBarCodeRead({data: scanner.pallet === null ? '1234' : '12345678ABCDEF1234'}); // Inserts test data
+                        onBarCodeRead({data: scanner.pallet === null ? '1234' : '12345678  ABCDEF  1234'}); // Inserts test data
                     }}>
                     <Image style={styles.cameraIcon} source={Patodebug}/>
                 </TouchableOpacity>

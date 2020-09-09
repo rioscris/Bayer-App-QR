@@ -4,7 +4,7 @@ import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, N
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import {SCAN_CLEAR} from '../scanner/action';
-import { generateQR } from './zpl';
+import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Print, Patodebug } from '../../images';
@@ -15,18 +15,8 @@ const Preview = (props) => {
     const { navigation } = props;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    const zpl = 
-    `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
-    ^XA
-    ^MMT
-    ^PW799
-    ^LL0519
-    ^LS0
-    
-    ^BY198,198^FT435,385^BXN,9,200,0,0,1,~
-    ^FH\\^FD\\7E19250000000001\\7E124080108274\\7E110ARACJ4\\7E1376720^FS
-    ^PQ1,0,1,Y^XZ
-    `;
+    const zpl = useGetZPL(scanner.pallet, scanner.lot, scanner.man);
+
     const print = () => {
         dispatch({type: SCAN_CLEAR});
         setPrinting(true);
@@ -48,15 +38,16 @@ const Preview = (props) => {
         );
     }
     const printDebug = () => {
-        setPrinting(true);
-        dispatch({type: SCAN_CLEAR});
-        Alert.alert('Imprimiendo...', 
-            'Enviando datos a la impresora', 
-            [{text: 'Continuar', onPress: () => {
-                navigation.goBack();
-                setPrinting(false);
-            }}]
-        );
+        console.log('zpl is \n' + zpl); // para lucas: probar si esto funca bien
+        // setPrinting(true);
+        // dispatch({type: SCAN_CLEAR});
+        // Alert.alert('Imprimiendo...', 
+        //     'Enviando datos a la impresora', 
+        //     [{text: 'Continuar', onPress: () => {
+        //         navigation.goBack();
+        //         setPrinting(false);
+        //     }}]
+        // );
     }
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {

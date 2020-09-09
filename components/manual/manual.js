@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { View, Image, StyleSheet } from 'react-native';
 import { getLotFields } from '../preview/zpl';
-import { SAVE_PALLET, SAVE_LOT } from '../scanner/action';
+import { SAVE_PALLET, SAVE_LOT_MAN } from '../scanner/action';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { Check, Camera } from '../../images/';
 
@@ -23,7 +23,7 @@ const Manual = (props) => {
             setPalletView(false);
         }
         else{
-            dispatch({type: SAVE_LOT, payload: matCode + lotNo + qty});
+            dispatch({type: SAVE_LOT_MAN, payload: {matCode, lotNo, qty}});
             navigation.replace('Preview');
             setPalletView(true);
         }
@@ -33,6 +33,7 @@ const Manual = (props) => {
             setPallet(scannerStorage.pallet);
             setPalletView(false);
         }
+        // Siempre deberia entrar con scannerStorage.lot == null, se deja esta implementacion por si se ingresase primero el lote, lo cual no pasa
         let {matCode, lotNo, qty} = getLotFields(scannerStorage.lot); // Defaults to {matCode: '', lotNo: '', qty: ''}
         setMatCode(matCode);
         setLotNo(lotNo);
