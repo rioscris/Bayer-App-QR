@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Text,
-    View,
-    StyleSheet, Alert, TouchableOpacity,
-    Image,
-    TextInput,
-    Screen,
-    Dimensions
-} from 'react-native';
-
-import { RNCamera } from 'react-native-camera';
-import BarcodeMask from 'react-native-barcode-mask';
-import { useDispatch } from 'react-redux';
-import useScannerStorage from '../home/hooks/useScannerStorage';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import {SAVE_PALLET, SAVE_LOT} from './action'
 import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+    Dimensions, Image, StyleSheet, Text,
+
+    TouchableOpacity, View
+} from 'react-native';
+import BarcodeMask from 'react-native-barcode-mask';
+import { RNCamera } from 'react-native-camera';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useDispatch } from 'react-redux';
 import { FlashOff, FlashOn, Manual, Patodebug } from '../../images';
+import useScannerStorage from '../home/hooks/useScannerStorage';
+import { SAVE_LOT_AUTO, SAVE_PALLET } from './action';
+
 
 const BarcodeScanner = (props) => {
     const [torch, setTorch] = useState(false);
@@ -31,6 +27,7 @@ const BarcodeScanner = (props) => {
     const defaultBarcodeTypes = [RNCamera.Constants.BarCodeType.code128]
     const [isBarcodeRead, setIsBarcodeRead] = useState(false);
     const [refresh, setRefresh] = useState(false);
+
     useEffect(() => {
         const totalFrameWidth = frameWidthRel * Screen.h;
         const totalFrameHeight = frameHeightRel * Screen.w;
@@ -45,14 +42,16 @@ const BarcodeScanner = (props) => {
     const onBarCodeRead = (barcode) => {
         if(!isBarcodeRead){
             setIsBarcodeRead(true);
-            if(scanner.pallet === null){
+            if(barcode.data && scanner.pallet === null){ //Mensaje que diga, Pallet mal ingresado. o mal leido.
                 dispatch({type: SAVE_PALLET, payload: barcode.data});
                 setScanner({...scanner, pallet: barcode.data});
             }
             else if(scanner.lot === null){
-                dispatch({type: SAVE_LOT, payload: barcode.data});
-                setScanner({pallet: null, lot: null});
-                navigation.navigate('Preview');
+                if(barcode.data && barcode.data.length > 22){
+                    dispatch({type: SAVE_LOT_AUTO, payload: barcode.data});
+                    setScanner({pallet: null, lot: null});
+                    navigation.navigate('Preview');
+                }
             }
         }
     }
@@ -107,6 +106,7 @@ const BarcodeScanner = (props) => {
                     opacity: 0.5,
                     }}
                 /> */}
+
             </RNCamera>
             <View style={styles.bottomOverlay}>
                 <TouchableOpacity onPress={() => setTorch(!torch)}>
@@ -119,7 +119,7 @@ const BarcodeScanner = (props) => {
                     <Image style={styles.cameraIcon} source={Manual}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
-                        onBarCodeRead({data: scanner.pallet === null ? '1234' : '12345678ABCDEF1234'}); // Inserts test data
+                        onBarCodeRead({data: scanner.pallet === null ? '50000000001' : '12345678 ABCDEF 1234'}); // Inserts test data
                     }}>
                     <Image style={styles.cameraIcon} source={Patodebug}/>
                 </TouchableOpacity>

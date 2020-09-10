@@ -1,8 +1,10 @@
-import {SAVE_PALLET, SAVE_LOT, SCAN_CLEAR} from './action.js';
+import {SAVE_PALLET, SAVE_LOT_AUTO, SAVE_LOT_MAN, SCAN_CLEAR} from './action.js';
 
 const initialState = {
     pallet: null,
-    lot: null,
+    lotNo: null,
+    matCode:null,
+    qty:null,
 }
 
 const barcodeReducer = (state = initialState, action) => {
@@ -11,14 +13,25 @@ const barcodeReducer = (state = initialState, action) => {
             return {
                 ...state, pallet: action.payload
             }
-        case SAVE_LOT: 
+        case SAVE_LOT_AUTO:
+            return{
+            ...state,
+            matCode: action.payload.slice(0, 8), ///12345678  ABCDEF  1234 
+            lotNo:action.payload.slice(8, 18).trim().toUpperCase(),
+            qty:action.payload.slice(18),
+        }
+        case SAVE_LOT_MAN: 
             return {
-                ...state, lot: action.payload
+                ...state,
+                matCode: action.payload.matCode,
+                lotNo: action.payload.lotNo.trim().toUpperCase(),
+                qty: action.payload.qty,
             }
         case SCAN_CLEAR:
             return {
                 pallet: null,
                 lot: null,
+                man: false,
             }
         default: 
             return state;
