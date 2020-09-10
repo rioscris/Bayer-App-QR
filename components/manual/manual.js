@@ -13,11 +13,21 @@ const Manual = (props) => {
     const scannerStorage = useScannerStorage();
     const { navigation } = props;
     const [palletView, setPalletView] = useState(true);
-    const [pallet, setPallet] = useState(null);
+    const [pallet, setPallet] = useState(null); //todo este state, podria estar en uno solo?
     const [matCode, setMatCode] = useState(null);
     const [lotNo, setLotNo] = useState(null);
     const [qty, setQty] = useState(null);
-    const onSubmit = () => {
+
+    useEffect(() => {
+        if(scannerStorage.pallet){
+            setPallet(scannerStorage.pallet);
+            setPalletView(false);
+        }
+    }, [])
+
+
+
+    const onSubmit = () => { //Hacer un solo dispatch.
         if(palletView){
             dispatch({type: SAVE_PALLET, payload: pallet});
             setPalletView(false);
@@ -28,22 +38,12 @@ const Manual = (props) => {
             setPalletView(true);
         }
     }
-    useEffect(() => {
-        if(scannerStorage.pallet){
-            setPallet(scannerStorage.pallet);
-            setPalletView(false);
-        }
-        // Siempre deberia entrar con scannerStorage.lot == null, se deja esta implementacion por si se ingresase primero el lote, lo cual no pasa
-        let {matCode, lotNo, qty} = getLotFields(scannerStorage.lot); // Defaults to {matCode: '', lotNo: '', qty: ''}
-        setMatCode(matCode);
-        setLotNo(lotNo);
-        setQty(qty);
-    }, [])
+
     return (
         <ScrollView>
             <View>
                 {palletView ? 
-                    <TextInput style={styles.field} placeholder='Numero de pallet' onChangeText={(e) => setPallet(e)} value={pallet}/>
+                    <TextInput style={styles.field} placeholder='Numero de paleta' onChangeText={(e) => setPallet(e)} value={pallet}/>
                 : 
                     <>
                         <TextInput style={styles.field} placeholder='Código de material' onChangeText={(e) => setMatCode(e)} value={matCode}/>

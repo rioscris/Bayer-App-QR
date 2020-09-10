@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules } from 'react-native';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import {SCAN_CLEAR} from '../scanner/action';
+import { SCAN_CLEAR } from '../scanner/action';
 import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -15,86 +15,107 @@ const Preview = (props) => {
     const { navigation } = props;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    const zpl = useGetZPL(scanner.pallet, scanner.lot, scanner.man);
+    const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
 
-    const print = () => {
-        dispatch({type: SCAN_CLEAR});
-        setPrinting(true);
-        Alert.alert('Imprimiendo...', 
-            'Enviando datos a la impresora', 
-            [{text: 'Continuar', onPress: () => {
-                NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
-                    navigation.goBack()
-                }).catch(() => {
-                    Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
-                        text: 'Aceptar',
-                        onPress: () => {
-                            navigation.popToTop();
-                        }
-                    }]);
-                })
-                setPrinting(false);
-            }}]
-        );
-    }
-    const printDebug = () => {
-        // console.log('zpl is \n' + zpl); // para lucas: probar si esto funca bien
-        setPrinting(true);
-        dispatch({type: SCAN_CLEAR});
-        Alert.alert('Imprimiendo...', 
-            'Enviando datos a la impresora', 
-            [{text: 'Continuar', onPress: () => {
-                navigation.goBack();
-                setPrinting(false);
-            }}]
-        );
-    }
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {
             const value = JSON.parse(json);
             setDevice(value);
         });
-        if(scanner){
-            if(scanner.lot && scanner.lot.length < 18){
+        if (scanner) { //Vuela
+            const totalLot = scanner.lotNo.length + scanner.qty.length + scanner.matCode.length;
+            if (totalLot < 22) { //La validacion se hara en el componente manual / barcodeScanner
                 Alert.alert('Error de lectura',
-                'El largo de la identificación de lote es menor a la necesaria (Material + Lote + Cantidad). Revise la lectura nuevamente.',
-                [{text: 'Releer', onPress: () => {
-                    dispatch({type: SCAN_CLEAR});
-                    navigation.goBack()
-                }}])
+                    'El largo de la identificación de lote es menor a la necesaria (Material + Lote + Cantidad). Revise la lectura nuevamente.',
+                    [{
+                        text: 'Releer', onPress: () => {
+                            dispatch({ type: SCAN_CLEAR });
+                            navigation.goBack()
+                        }
+                    }])
             }
-            if(!scanner.pallet){
+            if (!scanner.pallet) {
                 Alert.alert('Error de lectura',
-                'El codigo de palleta no fue leido correctamente.',
-                [{text: 'Releer', onPress: () => {
-                    dispatch({type: SCAN_CLEAR});
-                    navigation.goBack()
-                }}])
+                    'El codigo de palleta no fue leido correctamente.',
+                    [{
+                        text: 'Releer', onPress: () => {
+                            dispatch({ type: SCAN_CLEAR });
+                            navigation.goBack()
+                        }
+                    }])
             }
         }
     }, []);
-    
-    return(
+
+    const print = () => {
+        dispatch({ type: SCAN_CLEAR });
+        setPrinting(true);
+        Alert.alert('Imprimiendo...',
+            'Enviando datos a la impresora',
+            [{
+                text: 'Continuar', onPress: () => {
+                    NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
+                        navigation.goBack()
+                    }).catch(() => {
+                        Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
+                            text: 'Aceptar',
+                            onPress: () => {
+                                navigation.popToTop();
+                            }
+                        }]);
+                    })
+                    setPrinting(false);
+                }
+            }]
+        );
+    }
+
+    const printDebug = () => { // Vuela
+        setPrinting(true);
+        dispatch({ type: SCAN_CLEAR });
+        Alert.alert('Imprimiendo...',
+            'Enviando datos a la impresora',
+            [{
+                text: 'Continuar', onPress: () => {
+                    navigation.goBack();
+                    setPrinting(false);
+                }
+            }]
+        );
+    }
+
+
+    return (
         <View styles={styles.container}>
-            <TextInput 
+            <TextInput //Scanner.map() genere inputs
                 style={styles.field}
                 editable={false}
                 value={scanner.pallet}
             />
-            <TextInput 
+            <TextInput
                 style={styles.field}
                 editable={false}
-                value={scanner.lot}
+                value={scanner.matCode}
+            />
+            <TextInput
+                style={styles.field}
+                editable={false}
+                value={scanner.lotNo}
+            />
+            <TextInput
+                style={styles.field}
+                editable={false}
+                value={scanner.qty}
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, {backgroundColor: "#2DCC70"}]} onPress={() => print()} disabled={printing}>
-                    <Image style={styles.image} source={Print}/>
+                <TouchableOpacity style={[styles.button, { backgroundColor: "#2DCC70" }]} onPress={() => print()} disabled={printing}>
+                    <Image style={styles.image} source={Print} />
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, {borderColor: '#fafafa', marginLeft: 20, backgroundColor: 'white'}]} onPress={() => printDebug()}>
-                    <Image style={styles.image} source={Patodebug}/>
+                <TouchableOpacity style={[styles.button, { borderColor: '#fafafa', marginLeft: 20, backgroundColor: 'white' }]} onPress={() => printDebug()}>
+                    <Image style={styles.image} source={Patodebug} />
                 </TouchableOpacity>
             </View>
-            {printing && <ActivityIndicator size='large' color='#00ff00'/>}
+            {printing && <ActivityIndicator size='large' color='#00ff00' />}
         </View>
     )
 }
@@ -119,21 +140,21 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
     buttonContainer: {
-        alignItems: "center", 
-        justifyContent: "center", 
+        alignItems: "center",
+        justifyContent: "center",
         flexDirection: "row",
     },
     button: {
-        backgroundColor: '#f2f2f2', 
-        borderRadius: 50, 
-        elevation: 10, 
-        shadowColor: "#000", 
-        shadowOpacity: 1, 
+        backgroundColor: '#f2f2f2',
+        borderRadius: 50,
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOpacity: 1,
         shadowRadius: 5,
     },
     image: {
-        width: 60, 
-        height: 60, 
+        width: 60,
+        height: 60,
         margin: 10,
     },
 })
