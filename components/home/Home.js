@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
-    Button,
     Image, SafeAreaView, ScrollView,
     StatusBar, StyleSheet,
     Text, View, NativeModules
@@ -12,6 +11,8 @@ import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
 import Patodebug from '../../images/patodebug.png';
+
+import { Button} from 'react-native-elements'
 
 
 const Presentation = () => (
