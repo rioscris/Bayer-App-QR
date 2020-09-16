@@ -1,24 +1,23 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
-    Image, SafeAreaView, ScrollView,
+    SafeAreaView, ScrollView,
     StatusBar, StyleSheet,
-    Text, View, NativeModules
+    Text, View
 } from 'react-native';
+import { Button, Card } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
-import Patodebug from '../../images/patodebug.png';
-import { Card, ListItem, Button } from 'react-native-elements'
-import AntDesignIcon from 'react-native-vector-icons/AntDesign'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const Presentation = () => (
     <View>
         <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Bienvenido a aplicación eLector</Text>
+            <Text style={styles.sectionTitle}>Bienvenido a eLector</Text>
             <Text style={styles.sectionDescription}>
                 Con esta aplicación podrá leer los códigos de barra de una etiqueta e imprimir los códigos QR correspondientes.
             </Text>

@@ -140,7 +140,7 @@ const BarcodeScanner = ({ navigation, route }) => {
                     type === "barcode" ?
                         <TouchableOpacity onPress={() => {
                             setRefresh(true);
-                            navigation.navigate('Manual');
+                            navigation.navigate('Manual', { validate: validate });
                         }}>
                             <Image style={styles.cameraIcon} source={Manual} />
                         </TouchableOpacity>
