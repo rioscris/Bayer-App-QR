@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules } from 'react-native';
+import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules, Text } from 'react-native';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { SCAN_CLEAR } from '../scanner/action';
-import { generateQR } from './zpl';
+import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Print, Patodebug } from '../../images';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+
+const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
+    return (
+        <TouchableOpacity style={tchStyle} onPress={onPress}>
+            <Image style={imgStyle} source={source} />
+        </TouchableOpacity>
+    )
+}
 
 const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -15,18 +22,8 @@ const Preview = ({ navigation, route }) => {
     const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    const zpl =
-        `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
-    ^XA
-    ^MMT
-    ^PW799
-    ^LL0519
-    ^LS0
-    
-    ^BY198,198^FT435,385^BXN,9,200,0,0,1,~
-    ^FH\\^FD\\7E19250000000001\\7E124080108274\\7E110ARACJ4\\7E1376720^FS
-    ^PQ1,0,1,Y^XZ
-    `;
+    const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
+
     const print = () => {
         dispatch({ type: SCAN_CLEAR });
         setPrinting(true);
@@ -49,6 +46,7 @@ const Preview = ({ navigation, route }) => {
             }]
         );
     }
+
     const printDebug = () => {
         setPrinting(true);
         dispatch({ type: SCAN_CLEAR });
@@ -62,61 +60,35 @@ const Preview = ({ navigation, route }) => {
             }]
         );
     }
+
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {
             const value = JSON.parse(json);
             setDevice(value);
         });
-        if (scanner) {
-            if (scanner.lot && scanner.lot.length < 18) {
-                Alert.alert('Error de lectura',
-                    'El largo de la identificación de lote es menor a la necesaria (Material + Lote + Cantidad). Revise la lectura nuevamente.',
-                    [{
-                        text: 'Releer', onPress: () => {
-                            dispatch({ type: SCAN_CLEAR });
-                            navigation.goBack()
-                        }
-                    }])
-            }
-            if (!scanner.pallet) {
-                Alert.alert('Error de lectura',
-                    'El codigo de palleta no fue leido correctamente.',
-                    [{
-                        text: 'Releer', onPress: () => {
-                            dispatch({ type: SCAN_CLEAR });
-                            navigation.goBack()
-                        }
-                    }])
-            }
-        }
     }, []);
 
     return (
-        <View styles={styles.container}>
-            <TextInput
-                style={styles.field}
-                editable={false}
-                value={scanner.pallet}
-            />
-            <TextInput
-                style={styles.field}
-                editable={false}
-                value={scanner.lot}
-            />
+        <ScrollView styles={styles.container}>
+            <Text styles={styles.text}>
+                Datos leidos
+            </Text>
+            <TextInput style={styles.field} editable={false} value={scanner.pallet} />
+            <TextInput style={styles.field} editable={false} value={scanner.lotNo} />
+            <TextInput style={styles.field} editable={false} value={scanner.qty} />
+            <TextInput style={styles.field} editable={false} value={scanner.matCode} />
+
             <View style={styles.buttonContainer}>
                 {
                     !validate ? <View style={styles.buttonContainer} >
-                        <TouchableOpacity style={[styles.button, { backgroundColor: "#2DCC70" }]} onPress={() => print()} disabled={printing}>
-                            <Image style={styles.image} source={Print} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { borderColor: '#fafafa', marginLeft: 20, backgroundColor: 'white' }]} onPress={() => printDebug()}>
-                            <Image style={styles.image} source={Patodebug} />
-                        </TouchableOpacity>
+                        <Button title={"IMprimir"} onPress={print} />
+                        <Button title={"Imprimir debug"} onPress={printDebug} />
                     </View>
-                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner",{validate:false,type:"qr"})}/>}
+                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", {validate:false, type:"qr"})}/>
+                }
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
-        </View>
+        </ScrollView>
     )
 }
 
@@ -127,6 +99,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         justifyContent: "center",
+    },
+    text: {
+        fontSize: 20,
     },
     field: {
         margin: "5%",
@@ -151,6 +126,14 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOpacity: 1,
         shadowRadius: 5,
+    },
+    buttonDebug: {
+        borderColor: '#fafafa', 
+        marginLeft: 20, 
+        backgroundColor: 'white',
+    },
+    buttonPrint: {
+        backgroundColor: '#2DCC70',
     },
     image: {
         width: 60,
