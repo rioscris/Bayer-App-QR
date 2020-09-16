@@ -13,7 +13,6 @@ import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
 import Patodebug from '../../images/patodebug.png';
 
-
 const Presentation = () => (
     <View style={styles.body}>
         <View style={styles.sectionContainer}>
@@ -32,7 +31,7 @@ const Presentation = () => (
             <Text style={styles.sectionTitle}>Validación</Text>
             <Text style={styles.sectionDescription}>
                 La aplicación permite leer el código QR generado, los códigos de barra de la etiqueta original y compararlos para verificar que se corresponden según la nomenclatura GS1.
-        </Text>
+            </Text>
         </View>
     </View>
 )
@@ -86,13 +85,15 @@ const Home = (props) => {
                             <Button title={"Print something"}
                             onPress={() => {
                                 NativeModules.RNZebraBluetoothPrinter.print(device.macAddress,zpl).then((res) => {
-                                console.log(res)
+                                    console.log(res)
                                 })
                             }}
                             disabled={device.macAddress === 0}
                             />
                         </View>
-                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner')} disabled={device.macAddress === 0 && !debug}/>
+                        <Button title="Comenzar lectura" onPress={() => navigation.navigate('Scanner',{validate:false,type:"barcode"})} disabled={device.macAddress === 0 && !debug}/>
+                        <Button title="Validar" onPress={() => navigation.navigate('Scanner',{validate:true,type:"barcode"})} disabled={device.macAddress === 0 && !debug}/>
+                        {/* <Button title="Verificar inputs" onPress={() => navigation.navigate('Verify')} disabled={device.macAddress === 0 && !debug}/> */}
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={() => setDebug(!debug)}>

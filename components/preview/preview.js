@@ -1,51 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules } from 'react-native';
+import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules, Text } from 'react-native';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { SCAN_CLEAR } from '../scanner/action';
 import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { Print, Patodebug } from '../../images';
 
-const Preview = (props) => {
+const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
+    return (
+        <TouchableOpacity style={tchStyle} onPress={onPress} disabled={disabled}>
+            <Image style={imgStyle} source={source} />
+        </TouchableOpacity>
+    )
+}
+
+const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const scanner = useScannerStorage();
-    const { navigation } = props;
+    const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
     const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
-
-    useEffect(() => {
-        AsyncStorage.getItem('@storage_print').then((json) => {
-            const value = JSON.parse(json);
-            setDevice(value);
-        });
-        if (scanner) { //Vuela
-            const totalLot = scanner.lotNo.length + scanner.qty.length + scanner.matCode.length;
-            if (totalLot < 22) { //La validacion se hara en el componente manual / barcodeScanner
-                Alert.alert('Error de lectura',
-                    'El largo de la identificación de lote es menor a la necesaria (Material + Lote + Cantidad). Revise la lectura nuevamente.',
-                    [{
-                        text: 'Releer', onPress: () => {
-                            dispatch({ type: SCAN_CLEAR });
-                            navigation.goBack()
-                        }
-                    }])
-            }
-            if (!scanner.pallet) {
-                Alert.alert('Error de lectura',
-                    'El codigo de palleta no fue leido correctamente.',
-                    [{
-                        text: 'Releer', onPress: () => {
-                            dispatch({ type: SCAN_CLEAR });
-                            navigation.goBack()
-                        }
-                    }])
-            }
-        }
-    }, []);
 
     const print = () => {
         dispatch({ type: SCAN_CLEAR });
@@ -70,7 +48,7 @@ const Preview = (props) => {
         );
     }
 
-    const printDebug = () => { // Vuela
+    const printDebug = () => {
         setPrinting(true);
         dispatch({ type: SCAN_CLEAR });
         Alert.alert('Imprimiendo...',
@@ -84,39 +62,34 @@ const Preview = (props) => {
         );
     }
 
+    useEffect(() => {
+        AsyncStorage.getItem('@storage_print').then((json) => {
+            const value = JSON.parse(json);
+            setDevice(value);
+        });
+    }, []);
 
     return (
-        <View styles={styles.container}>
-            <TextInput //Scanner.map() genere inputs
-                style={styles.field}
-                editable={false}
-                value={scanner.pallet}
-            />
-            <TextInput
-                style={styles.field}
-                editable={false}
-                value={scanner.matCode}
-            />
-            <TextInput
-                style={styles.field}
-                editable={false}
-                value={scanner.lotNo}
-            />
-            <TextInput
-                style={styles.field}
-                editable={false}
-                value={scanner.qty}
-            />
+        <ScrollView styles={styles.container}>
+            <Text styles={styles.text}>
+                Datos leidos
+            </Text>
+            <TextInput style={styles.field} editable={false} value={scanner.pallet} />
+            <TextInput style={styles.field} editable={false} value={scanner.lotNo} />
+            <TextInput style={styles.field} editable={false} value={scanner.qty} />
+            <TextInput style={styles.field} editable={false} value={scanner.matCode} />
+
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, { backgroundColor: "#2DCC70" }]} onPress={() => print()} disabled={printing}>
-                    <Image style={styles.image} source={Print} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, { borderColor: '#fafafa', marginLeft: 20, backgroundColor: 'white' }]} onPress={() => printDebug()}>
-                    <Image style={styles.image} source={Patodebug} />
-                </TouchableOpacity>
+                {
+                    !validate ? <View style={styles.buttonContainer} >
+                        <ImageButton style={[styles.button, styles.buttonPrint]} onPress={() => print()} disabled={printing} imgStyle={styles.image} source={Print}/>
+                        <ImageButton style={[styles.button, styles.buttonDebug]} onPress={() => printDebug()} imgStyle={styles.image} source={Patodebug}/>
+                    </View>
+                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", {validate:false, type:"qr"})}/>
+                }
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
-        </View>
+        </ScrollView>
     )
 }
 
@@ -127,6 +100,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         justifyContent: "center",
+    },
+    text: {
+        fontSize: 20,
     },
     field: {
         margin: "5%",
@@ -151,6 +127,14 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOpacity: 1,
         shadowRadius: 5,
+    },
+    buttonDebug: {
+        borderColor: '#fafafa', 
+        marginLeft: 20, 
+        backgroundColor: 'white',
+    },
+    buttonPrint: {
+        backgroundColor: '#2DCC70',
     },
     image: {
         width: 60,
