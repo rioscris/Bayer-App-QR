@@ -16,7 +16,16 @@ const Stack = createStackNavigator();
 const Navigation = () => {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Home" headerMode={false}>
+            <Stack.Navigator initialRouteName="Home"
+                screenOptions={{
+                    headerStyle: {
+                        backgroundColor: '#38A6E3',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }}>
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Configuracion" component={Settings} />
                 <Stack.Screen name="Scanner" component={BarcodeScanner} />
