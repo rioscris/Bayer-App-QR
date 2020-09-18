@@ -1,4 +1,4 @@
-import { SAVE_DATA_QR, SAVE_LOT_AUTO, SAVE_LOT_MAN,SAVE_PALLET, SCAN_CLEAR } from './action.js';
+import { QR_CLEAR, SAVE_DATA_QR, SAVE_LOT_AUTO, SAVE_LOT_MAN,SAVE_PALLET, SCAN_CLEAR } from './action.js';
 
 const initialState = {
   pallet: null,
@@ -43,6 +43,14 @@ const barcodeReducer = (state = initialState, action) => {
         matCode: null,
         lotNo: null,
         qty:null
+      };
+    case QR_CLEAR:
+      return {
+        ...state,
+        qrPallet: null,
+        qrLot: null,
+        qrCant: null,
+        qrCodMat: null,
       };
     case SAVE_DATA_QR:
       const groups = action.payload.split(String.fromCharCode(29));

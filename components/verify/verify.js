@@ -1,81 +1,38 @@
-import React from 'react'
-import { TextInput, StyleSheet, Alert, View, ActivityIndicator, Image, NativeModules} from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import useGetDataToValidate from './hooks/useGetDataToValidate';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
-import {Text,Input,Button} from 'react-native-elements'
-import ShowDataInInputs from '../preview/ShowDataInInputs';
+import { useDispatch } from 'react-redux';
+import { QR_CLEAR } from '../scanner/action';
+import useGetDataToValidate from './hooks/useGetDataToValidate';
+import useGetVerifiedData from './hooks/useGetVerifiedData';
+import ShowCompareInputs from './ShowCompareInputs';
+import VerificationOverlay from './VerificationOverlay';
 
-const Verify = ({navigation}) => {
+const Verify = ({ navigation }) => {
+    const [visible, setVisible] = useState(true);
+    const dispatch = useDispatch()
     const scanner = useGetDataToValidate();
+    const { equalLotNo, equalMatCode, equalPallet, equalQty,verification } = useGetVerifiedData(scanner);
 
-    if(scanner.qrPallet !== scanner.pallet)
-        Alert.alert("Error en codigo de paleta")
+    useEffect(() => {
+        return (() => {
+            dispatch({ type: QR_CLEAR })
+        })
+    }, [])
 
-    if(scanner.qrCodMat !== scanner.matCode)
-        Alert.alert("Error en codigo de material")
-
-    if(scanner.qrLot !== scanner.lotNo)
-        Alert.alert("Error en codigo de lote")
-
-    if(scanner.qrCant !== scanner.qty)
-        Alert.alert("Error en cantidad")
-
-    const verification = 
-        scanner.qrPallet === scanner.pallet && 
-        scanner.qrCodMat === scanner.matCode &&
-        scanner.qrLot === scanner.lotNo &&
-        scanner.qrCant === scanner.qty;
 
     return (
         <ScrollView>
             <View styles={styles.container}>
-                <Text style={styles.text}>
-                    Datos extraidos del codigo de barra
-                </Text>
-                <ShowDataInInputs scanner={scanner}/>
-                <Text style={styles.text}>
-                    Datos extraidos del codigo QR
-                </Text>
-                <Text style={styles.text}>
-                    Numero de paleta
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.qrPallet}
-                />
-                <Text style={styles.text}>
-                    Código de material
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.qrCodMat}
-                />
-                <Text style={styles.text}>
-                    Código de lote
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.qrLot}
-                />
-                <Text style={styles.text}>
-                    Cantidad
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.qrCant}
-                />
+                <ShowCompareInputs scanner={scanner} equalLotNo={equalLotNo} equalMatCode={equalMatCode} equalPallet={equalPallet} equalQty={equalQty} />
             </View>
-            <View style={{margin: 20}}>
-                <Text style={{fontSize: 20, width: "100%", padding: 10, color: Colors.white, borderRadius: 5, backgroundColor: verification ? "#2DCC70" : "#d64040"}}>
-                    {verification ? 'Los datos en los dos grupos son correctos' : 'Los datos en los dos grupos difieren'}
-                </Text>
+            <VerificationOverlay setVisible={setVisible} visible={visible} verification={verification} navigation={navigation} dispatch={dispatch}/>
+            <View style={styles.buttonContainer}>
+                <View style={{ width: "80%", paddingTop: 10,paddingBottom:10 }}>
+                    <Button title="Volver" onPress={() => navigation.popToTop()} />
+                </View>
             </View>
-            <Button title="Volver" onPress={() => navigation.popToTop()} />
         </ScrollView>
     )
 }
@@ -88,37 +45,10 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
     },
-    text: {
-        fontSize: 20,
-    },
-    field: {
-        margin: "5%",
-        backgroundColor: "#cedee0",
-        height: 100,
-        borderRadius: 20,
-        fontFamily: "Helvetica, Arial, sans-serif;",
-        paddingHorizontal: 25,
-        marginBottom: 15,
-        fontSize: 20,
-        color: Colors.black,
-    },
     buttonContainer: {
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
-    },
-    button: {
-        backgroundColor: '#f2f2f2',
-        borderRadius: 50,
-        elevation: 10,
-        shadowColor: "#000",
-        shadowOpacity: 1,
-        shadowRadius: 5,
-    },
-    image: {
-        width: 60,
-        height: 60,
-        margin: 10,
     },
 })
 

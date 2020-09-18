@@ -56,7 +56,7 @@ const Preview = ({ navigation, route }) => {
                 Datos leidos
             </Text>
             <View>
-                <ShowDataInInputs scanner={scanner}/>
+                <ShowDataInInputs pallet={scanner.pallet} matCode={scanner.matCode} lotNo={scanner.lotNo} qty={scanner.qty}/>
             </View>
             <View style={styles.buttonContainer}>
                 {
