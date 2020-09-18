@@ -1,20 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux';
-import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules, Text } from 'react-native';
-import useScannerStorage from '../home/hooks/useScannerStorage';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { SCAN_CLEAR } from '../scanner/action';
-import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-
-const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
-    return (
-        <TouchableOpacity style={tchStyle} onPress={onPress}>
-            <Image style={imgStyle} source={source} />
-        </TouchableOpacity>
-    )
-}
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, NativeModules, StyleSheet, View } from 'react-native';
+import { Button, Text } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useDispatch } from 'react-redux';
+import useScannerStorage from '../home/hooks/useScannerStorage';
+import { SCAN_CLEAR } from '../scanner/action';
+import ShowDataInInputs from './ShowDataInInputs';
+import { useGetZPL } from './zpl';
 
 const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -47,44 +40,40 @@ const Preview = ({ navigation, route }) => {
         );
     }
 
-    const printDebug = () => {
-        setPrinting(true);
-        dispatch({ type: SCAN_CLEAR });
-        Alert.alert('Imprimiendo...',
-            'Enviando datos a la impresora',
-            [{
-                text: 'Continuar', onPress: () => {
-                    navigation.goBack();
-                    setPrinting(false);
-                }
-            }]
-        );
-    }
-
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {
             const value = JSON.parse(json);
             setDevice(value);
         });
+        return (() => {
+            setDevice({})
+        })
     }, []);
 
     return (
         <ScrollView styles={styles.container}>
-            <Text styles={styles.text}>
+            <Text h4 style={{ paddingLeft: 15,paddingTop:2 }}>
                 Datos leidos
             </Text>
-            <TextInput style={styles.field} editable={false} value={scanner.pallet} />
-            <TextInput style={styles.field} editable={false} value={scanner.lotNo} />
-            <TextInput style={styles.field} editable={false} value={scanner.qty} />
-            <TextInput style={styles.field} editable={false} value={scanner.matCode} />
-
+            <View>
+                <ShowDataInInputs scanner={scanner}/>
+            </View>
             <View style={styles.buttonContainer}>
                 {
                     !validate ? <View style={styles.buttonContainer} >
-                        <Button title={"IMprimir"} onPress={print} />
-                        <Button title={"Imprimir debug"} onPress={printDebug} />
+                        <View style={{width:"45%", paddingRight:20}}>
+                            <Button title={"Imprimir"} onPress={print} />
+                        </View>
+                        <View style={{width:"40%"}}>
+                            <Button title={"Cancelar"} onPress={() => {
+                                dispatch({type:SCAN_CLEAR})
+                                navigation.goBack();
+                                }} />
+                        </View>
                     </View>
-                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", {validate:false, type:"qr"})}/>
+                        : <View style={{width:"80%"}}> 
+                            <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", { validate: false, type: "qr" })} />
+                        </View>
                 }
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
@@ -100,21 +89,13 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
     },
-    text: {
+    textView: {
+        paddingLeft: 10,
         fontSize: 20,
-    },
-    field: {
-        margin: "5%",
-        backgroundColor: "#cedee0",
-        height: 100,
-        borderRadius: 20,
-        fontFamily: "Helvetica, Arial, sans-serif;",
-        paddingHorizontal: 25,
-        marginBottom: 15,
-        fontSize: 20,
-        color: Colors.black,
+        paddingBottom: 10
     },
     buttonContainer: {
+        paddingTop:5,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
@@ -126,19 +107,6 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOpacity: 1,
         shadowRadius: 5,
-    },
-    buttonDebug: {
-        borderColor: '#fafafa', 
-        marginLeft: 20, 
-        backgroundColor: 'white',
-    },
-    buttonPrint: {
-        backgroundColor: '#2DCC70',
-    },
-    image: {
-        width: 60,
-        height: 60,
-        margin: 10,
     },
 })
 

@@ -1,8 +1,10 @@
 import React from 'react'
-import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules, Text, } from 'react-native';
+import { TextInput, StyleSheet, Alert, View, ActivityIndicator, Image, NativeModules} from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import useGetDataToValidate from './hooks/useGetDataToValidate';
 import { ScrollView } from 'react-native-gesture-handler';
+import {Text,Input,Button} from 'react-native-elements'
+import ShowDataInInputs from '../preview/ShowDataInInputs';
 
 const Verify = ({navigation}) => {
     const scanner = useGetDataToValidate();
@@ -31,38 +33,7 @@ const Verify = ({navigation}) => {
                 <Text style={styles.text}>
                     Datos extraidos del codigo de barra
                 </Text>
-                <Text style={styles.text}>
-                    Numero de paleta
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.pallet}
-                />
-                <Text style={styles.text}>
-                    Código de material
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.matCode}
-                />
-                <Text style={styles.text}>
-                    Código de lote
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.lotNo}
-                />
-                <Text style={styles.text}>
-                    Cantidad
-                </Text>
-                <TextInput
-                    style={styles.field}
-                    editable={false}
-                    value={scanner.qty}
-                />
+                <ShowDataInInputs scanner={scanner}/>
                 <Text style={styles.text}>
                     Datos extraidos del codigo QR
                 </Text>
