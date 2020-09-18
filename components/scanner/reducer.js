@@ -34,6 +34,7 @@ const barcodeReducer = (state = initialState, action) => {
       };
     case SCAN_CLEAR:
       return {
+        ...state,
         pallet: null,
         qrPallet: null,
         qrLot: null,
