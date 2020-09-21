@@ -44,7 +44,7 @@ const VerificationBad = () => (
         <Text h4 style={{paddingLeft:"10%"}}>
             Validación fallida
         </Text>
-        <Text style={{fontSize:20,paddingLeft:"10%"}}>
+        <Text style={{fontSize:20,paddingLeft:"10%",paddingTop:30}}>
             Los valores de las etiquetas no coinciden.
         </Text>
     </View>

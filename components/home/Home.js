@@ -34,13 +34,13 @@ const Home = (props) => {
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
-          headerRight: () => (
-              <TouchableOpacity style={{paddingRight:20}}>
-                  <AntDesignIcon name='setting' size={30} color="white" onPress={() => navigation.navigate('Configuracion')} />
-              </TouchableOpacity>
-          ),
+            headerRight: () => (
+                <TouchableOpacity style={{ paddingRight: 20 }}>
+                    <AntDesignIcon name='setting' size={30} color="white" onPress={() => navigation.navigate('Configuracion')} />
+                </TouchableOpacity>
+            ),
         });
-      }, [navigation]);
+    }, [navigation]);
 
     useEffect(() => {
         try {
@@ -83,14 +83,14 @@ const Home = (props) => {
                             <View >
                                 <Button title="Generar codigo QR" onPress={() => navigation.navigate('Scanner', { validate: false, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
                             </View>
-                            <View style={{paddingTop:10}}>
+                            <View style={{ paddingTop: 10 }}>
                                 <Button title="Validar codigo QR" onPress={() => navigation.navigate('Scanner', { validate: true, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
                             </View>
-                        <View>
-                        <TouchableOpacity  onPress={() => setDebug(!debug)} style={{paddingLeft:"40%", paddingTop:10}}>
-                           <MaterialCommunityIcons name={"duck"} size={50} color="pink"/>
-                        </TouchableOpacity>
-                    </View>
+                            <TouchableOpacity onPress={() => setDebug(!debug)} style={{ paddingLeft: "40%", paddingTop: 10 }}>
+                                <View>
+                                    <MaterialCommunityIcons name={"duck"} size={50} color="pink" />
+                                </View>
+                            </TouchableOpacity>
                         </View>
                     </Card>
                 </ScrollView>

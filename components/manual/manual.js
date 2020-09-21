@@ -30,7 +30,7 @@ const Manual = ({ navigation, route }) => {
 
     const onSubmit = () => { //Hacer un solo dispatch.
         if (palletView) {
-            if (pallet.length === MAX_CANT_LOT) {
+            if (pallet.length === MAX_CANT_PALLET) {
                 dispatch({ type: SAVE_PALLET, payload: pallet });
                 setPalletView(false);
             } else {
