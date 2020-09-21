@@ -41,7 +41,7 @@ const Manual = ({ navigation, route }) => {
             const allLot = pallet.length + matCode.length + lotNo.length + qty.length;
             if(allLot >= CONFIRM_AVAILABLE){
                 dispatch({ type: SAVE_LOT_MAN, payload: { matCode, lotNo, qty } });
-                navigation.navigate('Preview', { validate: validate });
+                navigation.navigate('Visualizacion', { validate: validate });
                 setPalletView(true);
             } else{
                 alert("Los datos ingresados no son correctos.")
@@ -96,14 +96,16 @@ const Manual = ({ navigation, route }) => {
                 }
             </View>
             <View style={styles.buttonContainer}>
-                <View style={{paddingRight:30, width:"40%"}} >
-                    <Button onPress={onSubmit} title={"Confirmar"}/>
-                </View>
-                <View style={{paddingLeft:30, width:"40%"}}>
-                    <Button title={"Cancelar"} onPress={() => {  
+                <View style={{paddingLeft:10, width:"40%"}}>
+                    <Button title={"Cancelar"} 
+                    buttonStyle={{backgroundColor:'#DB3834'}}
+                    onPress={() => {  
                         dispatch({type : SCAN_CLEAR})
-                        navigation.navigate("Home")
+                        navigation.navigate("Menu")
                 }}/>
+                </View>
+                <View style={{paddingLeft:30, width:"45%"}} >
+                    <Button onPress={onSubmit} title={"Confirmar"} buttonStyle={{backgroundColor:'#00C18A'}}/>
                 </View>
             </View>
         </ScrollView>

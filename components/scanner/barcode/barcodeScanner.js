@@ -88,7 +88,7 @@ const BarcodeScanner = ({ navigation, route }) => {
                 if(barcode.data && barcode.data.length === 22) {
                     dispatch({ type: SAVE_LOT_AUTO, payload: barcode.data });
                     setScanner({ pallet: null, lot: null });
-                    navigation.navigate('Preview', { validate: validate });
+                    navigation.navigate('Visualizacion', { validate: validate });
                 }
                 else {
                     Alert.alert('Error de lectura', 'El codigo de lote ingresado no cumple con el largo requerido (Material + Lote + Cantidad)');
@@ -101,7 +101,7 @@ const BarcodeScanner = ({ navigation, route }) => {
         if (!isBarcodeRead) {
             setIsBarcodeRead(true);
             dispatch({type: SAVE_DATA_QR, payload: barcode.data});
-            navigation.navigate('Verify');
+            navigation.navigate('Verificacion');
         }
     }
 

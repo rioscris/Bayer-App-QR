@@ -26,12 +26,12 @@ const Navigation = () => {
                         fontWeight: 'bold',
                     },
                 }}>
-                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Menu" component={Home} />
                 <Stack.Screen name="Configuracion" component={Settings} />
-                <Stack.Screen name="Scanner" component={BarcodeScanner} />
-                <Stack.Screen name="Preview" component={Preview} />
+                <Stack.Screen name="Escanear" component={BarcodeScanner} />
+                <Stack.Screen name="Visualizacion" component={Preview} />
                 <Stack.Screen name="Manual" component={Manual} />
-                <Stack.Screen name="Verify" component={Verify} />
+                <Stack.Screen name="Verificacion" component={Verify} />
             </Stack.Navigator>
         </NavigationContainer>
     )

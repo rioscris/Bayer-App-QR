@@ -21,7 +21,6 @@ const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const scanner = useScannerStorage();
     const { validate } = route.params;
-    console.log('validate is in preview ' + validate)
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
     const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
@@ -61,27 +60,33 @@ const Preview = ({ navigation, route }) => {
 
     return (
         <ScrollView styles={styles.container}>
-            <Text h4 style={{ paddingLeft: 15,paddingTop:2 }}>
+            <Text h4 style={{ paddingLeft: 15, paddingTop: 2 }}>
                 Datos leidos
             </Text>
             <View>
-                <ShowDataInInputs pallet={scanner.pallet} matCode={scanner.matCode} lotNo={scanner.lotNo} qty={scanner.qty}/>
+                <ShowDataInInputs pallet={scanner.pallet} matCode={scanner.matCode} lotNo={scanner.lotNo} qty={scanner.qty} />
             </View>
             <View style={styles.buttonContainer}>
                 {
                     !validate ? <View style={styles.buttonContainer} >
-                        <View style={{width:"45%", paddingRight:20}}>
-                            <Button title={"Imprimir"} onPress={print} />
-                        </View>
-                        <View style={{width:"40%"}}>
-                            <Button title={"Cancelar"} onPress={() => {
-                                dispatch({type:SCAN_CLEAR})
-                                navigation.goBack();
+                        <View style={{ width: "50%",paddingRight: 20  }}>
+                            <Button
+                                buttonStyle={{ backgroundColor: '#DB3834' }}
+                                title={"Cancelar"} onPress={() => {
+                                    dispatch({ type: SCAN_CLEAR })
+                                    navigation.goBack();
                                 }} />
                         </View>
+                        <View style={{ width: "45%"}}>
+                            <Button title={"Imprimir"}
+                                buttonStyle={{ backgroundColor: '#00C18A' }}
+                                onPress={print} />
+                        </View>
                     </View>
-                        : <View style={{width:"80%"}}> 
-                            <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", { validate: false, type: "qr" })} />
+                        : <View style={{ width: "80%" }}>
+                            <Button title={"Validar con QR"}
+                                buttonStyle={{ backgroundColor: '#00C18A' }}
+                                onPress={() => navigation.navigate("Escanear", { validate: false, type: "qr" })} />
                         </View>
                 }
             </View>
@@ -104,7 +109,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     buttonContainer: {
-        paddingTop:5,
+        paddingTop: 5,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",

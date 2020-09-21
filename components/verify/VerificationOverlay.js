@@ -14,13 +14,15 @@ const VerificationOverlay = ({ setVisible, visible, verification,navigation,disp
             <Overlay overlayStyle={{height:"32%",width:"92%"}} isVisible={visible} onBackdropPress={toggleOverlay} >
                 {verification === true ? <VerificationOk /> : <VerificationBad />}
                 <View style={styles.buttonContainer}>
-                    <View style={{paddingRight:20,width:"40%"}}>
-                        <Button title={"Finalizar"} onPress={() => {  
-                            dispatch({type:SCAN_CLEAR})
-                            navigation.navigate("Home")}}/>
-                    </View>
                     <View style={{width:"35%"}}>
                         <Button title={"Ver datos"} onPress={toggleOverlay}/>
+                    </View>
+                    <View style={{paddingLeft:20,width:"40%"}}>
+                        <Button title={"Finalizar"} 
+                        buttonStyle={{backgroundColor:'#00C18A'}}
+                        onPress={() => {  
+                            dispatch({type:SCAN_CLEAR})
+                            navigation.navigate("Menu")}}/>
                     </View>
                 </View>
             </Overlay>

@@ -81,10 +81,13 @@ const Home = (props) => {
                         </View>
                         <View style={{ padding: 10, backgroundColor: Colors.white }}>
                             <View >
-                                <Button title="Generar codigo QR" onPress={() => navigation.navigate('Scanner', { validate: false, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
+                                <Button title="Generar codigo QR" onPress={() => navigation.navigate('Escanear', { validate: false, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
                             </View>
                             <View style={{ paddingTop: 10 }}>
-                                <Button title="Validar codigo QR" onPress={() => navigation.navigate('Scanner', { validate: true, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
+                                <Button title="Validar codigo QR" onPress={() => navigation.navigate('Escanear', { validate: true, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
+                            </View>
+                            <View style={{ paddingTop: 10 }}>
+                                <Button title="Validar codigo a" onPress={() => navigation.navigate('Verificacion', { validate: true, type: "barcode" })} disabled={device.macAddress === 0 && !debug} />
                             </View>
                             <TouchableOpacity onPress={() => setDebug(!debug)} style={{ paddingLeft: "40%", paddingTop: 10 }}>
                                 <View>
