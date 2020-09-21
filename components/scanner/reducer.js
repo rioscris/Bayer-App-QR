@@ -63,7 +63,7 @@ const barcodeReducer = (state = initialState, action) => {
         ...state,
         qrPallet: groups[ix.indexOf('pallet')].split(palletGS).pop(), 
         qrCodMat: groups[ix.indexOf('mat')].split(matGS).pop(),
-        qrLot: groups[ix.indexOf('lot')].split(lotGS).pop(),
+        qrLot: groups[ix.indexOf('lot')].split(lotGS).pop().trim(),
         qrCant: groups[ix.indexOf('qty')].split(qtyGS).pop(),
       };
     default:

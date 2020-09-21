@@ -1,18 +1,27 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, NativeModules, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, NativeModules, StyleSheet, View, Image } from 'react-native';
 import { Button, Text } from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { SCAN_CLEAR } from '../scanner/action';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ShowDataInInputs from './ShowDataInInputs';
 import { useGetZPL } from './zpl';
+
+const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
+    return (
+        <TouchableOpacity style={tchStyle} onPress={onPress} disabled={disabled}>
+            <Image style={imgStyle} source={source} />
+        </TouchableOpacity>
+    )
+}
 
 const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const scanner = useScannerStorage();
     const { validate } = route.params;
+    console.log('validate is in preview ' + validate)
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
     const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
