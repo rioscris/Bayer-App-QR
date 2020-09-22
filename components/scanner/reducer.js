@@ -1,3 +1,4 @@
+import { trimLeft } from '../../helper/functions.js';
 import { QR_CLEAR, SAVE_DATA_QR, SAVE_LOT_AUTO, SAVE_LOT_MAN,SAVE_PALLET, SCAN_CLEAR } from './action.js';
 
 const initialState = {
@@ -16,7 +17,7 @@ const barcodeReducer = (state = initialState, action) => {
     case SAVE_PALLET:
       return {
         ...state,
-        pallet: action.payload,
+        pallet: trimLeft(action.payload, '0'),
       };
     case SAVE_LOT_AUTO:
       return {

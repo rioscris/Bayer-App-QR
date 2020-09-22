@@ -34,7 +34,6 @@ const Preview = ({ navigation, route }) => {
             [{
                 text: 'Continuar', onPress: () => {
                     zplMgr.getZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode).then((zpl) => {
-                        console.log(zpl)
                         NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
                             navigation.goBack()
                         }).catch(() => {

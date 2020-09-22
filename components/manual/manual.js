@@ -30,11 +30,11 @@ const Manual = ({ navigation, route }) => {
 
     const onSubmit = () => { //Hacer un solo dispatch.
         if (palletView) {
-            if (pallet.length === MAX_CANT_PALLET) {
+            if (pallet.length >= MAX_CANT_PALLET) {
                 dispatch({ type: SAVE_PALLET, payload: pallet });
                 setPalletView(false);
             } else {
-                alert("el numero de paleta es incorrecto");
+                alert("El número de paleta es inválido.");
             }
         }
         else {
@@ -60,7 +60,7 @@ const Manual = ({ navigation, route }) => {
                             </Text>
                             <Card.Divider />
                             <Input placeholder='Numero de paleta' onChangeText={(e) => setPallet(e)} value={pallet} keyboardType="numeric"
-                                rightIcon={pallet.length === MAX_CANT_PALLET ? <AntDesignIcon name={"checkcircle"} size={25} color="green" />
+                                rightIcon={pallet.length >= MAX_CANT_PALLET ? <AntDesignIcon name={"checkcircle"} size={25} color="green" />
                                     : <EntypoIcon name={"circle-with-cross"} size={25} color="red" />} />
                         </Card>
                     </View>
