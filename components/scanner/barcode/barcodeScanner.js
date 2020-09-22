@@ -1,37 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
-    Text,
-    View,
-    StyleSheet, Alert, TouchableOpacity,
-    Image,
-    TextInput,
-    Screen,
-    Dimensions
+    Alert,
+    Dimensions, Image, StyleSheet, Text,
+    TouchableOpacity, View
 } from 'react-native';
-
 import { RNCamera } from 'react-native-camera';
 import { useDispatch } from 'react-redux';
 import useScannerStorage from '../../home/hooks/useScannerStorage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { SAVE_PALLET, SAVE_LOT_AUTO, SAVE_DATA_QR } from '../action'
-import { useFocusEffect } from '@react-navigation/native';
-import { FlashOff, FlashOn, Manual, Patodebug } from '../../../images';
+import { Manual, TorchOff, TorchOn } from '../../../images';
 
-const Mask = (measures) => {
-    return <View
-        style={[styles.mask, {
-            top: measures.leftMargin,
-            right: measures.topMargin,
-            width: measures.frameHeight,
-            height: measures.frameWidth,
-        }]}
-    />
+const Mask = ({measures, type}) => {
+    return <>
+        <View style={styles.maskOutter}>
+            <View style={{height: measures.leftMargin, width: '100%', backgroundColor: 'rgba(0,0,0,0.5)'}}/>
+            <View style={{height: measures.frameWidth, flexDirection: "row"}}>
+                <View style={{width: measures.topMargin, height: '100%', backgroundColor: 'rgba(0,0,0,0.5)'}}/>
+                <View style={{width: measures.frameHeight, height: '100%'}}/>
+                <View style={{width: measures.topMargin, height: '100%', backgroundColor: 'rgba(0,0,0,0.5)'}}/>
+            </View>
+            <View style={{height: measures.leftMargin, width: '100%', backgroundColor: 'rgba(0,0,0,0.5)'}}/>
+        </View>
+        { type !== 'qr' && 
+        <View style={{flex: 1, flexDirection: "column", justifyContent: 'center'}}>
+            <View style={{borderBottomColor: '#b00000', borderBottomWidth: 6}}/>
+        </View>
+        }
+    </>
 }
 
-const Torch = (onPress, isOn) => {
+const Torch = ({onPress, isOn}) => {
     return (
-    <TouchableOpacity onPress={onPress}>
-        <Image style={styles.cameraIcon} source={isOn ? FlashOff : FlashOn} />
+    <TouchableOpacity onPress={() => onPress()}>
+        <Image style={styles.cameraIcon} source={isOn ? TorchOn : TorchOff} />
     </TouchableOpacity>)
 }
 
@@ -41,9 +44,6 @@ const BarcodeScanner = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const scannerStorage = useScannerStorage();
     const [scanner, setScanner] = useState({ pallet: null, lot: null });
-
-    let frameWidthRel = 0.1;
-    let frameHeightRel = 0.8;
 
     const [Screen, setScreen] = useState({ w: Dimensions.get('screen').width, h: Dimensions.get('screen').height });
     const [mask, setMask] = useState({ leftMargin: 0, topMargin: 0, frameWidth: 0, frameHeight: 0 });
@@ -56,9 +56,16 @@ const BarcodeScanner = ({ navigation, route }) => {
     const [refresh, setRefresh] = useState(false);
     
     useEffect(() => {
-        if(type === "qr"){
-            frameWidthRel = 0.6; //Aumenta el alto
-            frameHeightRel = 0.8; //Aumenta el ancho
+        let frameWidthRel;
+        let frameHeightRel;
+        const isPortrait = Dimensions.get('window').height > Dimensions.get('window').width;
+        if(type === 'qr'){
+            frameWidthRel = isPortrait ? 0.5 : 0.8; //Aumenta el alto
+            frameHeightRel = isPortrait ? 0.8 : 0.5; //Aumenta el ancho
+        }
+        else{
+            frameWidthRel = isPortrait ? 0.25 : 0.3;
+            frameHeightRel = isPortrait ? 1 : 1;
         }
         const totalFrameWidth = frameWidthRel * Screen.h;
         const totalFrameHeight = frameHeightRel * Screen.w;
@@ -81,7 +88,7 @@ const BarcodeScanner = ({ navigation, route }) => {
                 if(barcode.data && barcode.data.length === 22) {
                     dispatch({ type: SAVE_LOT_AUTO, payload: barcode.data });
                     setScanner({ pallet: null, lot: null });
-                    navigation.navigate('Preview', { validate: validate });
+                    navigation.navigate('Visualizacion', { validate: validate });
                 }
                 else {
                     Alert.alert('Error de lectura', 'El codigo de lote ingresado no cumple con el largo requerido (Material + Lote + Cantidad)');
@@ -94,7 +101,7 @@ const BarcodeScanner = ({ navigation, route }) => {
         if (!isBarcodeRead) {
             setIsBarcodeRead(true);
             dispatch({type: SAVE_DATA_QR, payload: barcode.data});
-            navigation.navigate('Verify');
+            navigation.navigate('Verificacion');
         }
     }
 
@@ -115,7 +122,7 @@ const BarcodeScanner = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <RNCamera
-                style={styles.preview}
+                style={styles.cameraView}
                 rectOfInterest={{
                     x: mask.leftMargin / Screen.h,
                     y: mask.topMargin / Screen.w,
@@ -135,7 +142,7 @@ const BarcodeScanner = ({ navigation, route }) => {
                 onBarCodeRead={(barcode) => type === "barcode" ? onBarCodeRead(barcode) : onQrCodeRead(barcode)}
                 barCodeTypes={type === "barcode" ? defaultBarcodeTypes : defaultQrCodeTypes}
             >
-                <Mask measures={mask}/>
+                <Mask measures={mask} type={type}/>
             </RNCamera>
 
             <View style={styles.bottomOverlay}>
@@ -144,43 +151,28 @@ const BarcodeScanner = ({ navigation, route }) => {
                     type === "barcode" ?
                         <TouchableOpacity onPress={() => {
                             setRefresh(true);
-                            navigation.navigate('Manual');
+                            navigation.navigate('Manual', { validate: validate });
                         }}>
                             <Image style={styles.cameraIcon} source={Manual} />
                         </TouchableOpacity>
                         : null
                 }
-                {
-                    type === "barcode" ?
-                <TouchableOpacity onPress={() => {
-                    onBarCodeRead({ data: scanner.pallet === null ? '50000000001' : '12345678  ABCDEF  1234' }); // Inserts test data
-                }}>
-                    <Image style={styles.cameraIcon} source={Patodebug} />
-                </TouchableOpacity>
-                : 
-                <TouchableOpacity onPress={() => {
-                    const GS = String.fromCharCode(29);
-                    onQrCodeRead({ data:  `${GS}9250000000001${GS}24012345678${GS}10ABCDEF${GS}371234`}); // Inserts test data
-                }}>
-                    <Image style={styles.cameraIcon} source={Patodebug} />
-                </TouchableOpacity>
-                }
             </View>
             {
                 type === "barcode" ?
-                    <View style={{ bottom: 0, position: 'absolute', width: '100%', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <View style={{ bottom: 0, position: 'absolute', width: '100%' }}>
                         <View style={styles.instruction}>
                             <Text style={styles.instructionText}>
-                                {scanner.pallet === null ? '' : `Valor Leido ${scanner.pallet}`}
+                                {scanner.pallet === null ? '' : `Código Leido: ${scanner.pallet}`}
                             </Text>
                         </View>
                         <View style={styles.instruction}>
                             <Text style={styles.instructionText}>
-                                {scanner.pallet === null ? "Escanee el Pallet" : "Escanee el lote"}
+                                {scanner.pallet === null ? "Pase el lector sobre el código de paleta" : "Pase el lector sobre el código de lote"}
                             </Text>
                         </View>
                     </View>
-                    : <View style={{ bottom: 0, position: 'absolute', width: '100%', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    : <View style={{ bottom: 0, position: 'absolute', width: '100%' }}>
                     <View style={styles.instruction}>
                         <Text style={styles.instructionText}>
                             Escanee el codigo QR
@@ -195,12 +187,17 @@ const BarcodeScanner = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
+        // flexDirection: 'row',
     },
     preview: {
         flex: 1,
         justifyContent: 'flex-end',
-        alignItems: 'center'
+        alignItems: 'center',
+    },
+    mask: {
+        position: 'absolute',
+        borderWidth: 1.5,
+        borderColor: '#62B1F6',
     },
     mask: {
         position: 'absolute',
@@ -233,7 +230,33 @@ const styles = StyleSheet.create({
         fontFamily: "Helvetica, Arial, sans-serif;",
         color: Colors.white,
         fontSize: 20,
-    }
-})
+    },
+    container: {
+        flex: 1,
+    },
+      cameraView: {
+        flex: 1,
+        justifyContent: 'flex-start',
+    },
+      maskOutter: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+      },
+      maskInner: {
+        width: 300,
+        backgroundColor: 'transparent',
+      },
+      maskFrame: {
+        backgroundColor: 'rgba(1,1,1,0.6)',
+      },
+      maskRow: {
+        width: '100%',
+      },
+      maskCenter: { flexDirection: 'row' },
+    },
+)
 
 export default BarcodeScanner;

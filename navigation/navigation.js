@@ -10,19 +10,30 @@ import BarcodeScanner from '../components/scanner/barcode/barcodeScanner'
 import Preview from '../components/preview/preview';
 import Manual from '../components/manual/manual';
 import Verify from '../components/verify/verify';
+import Editor from '../components/editor/editor';
 
 const Stack = createStackNavigator();
 
 const Navigation = () => {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Home" headerMode={false}>
-                <Stack.Screen name="Home" component={Home} />
+            <Stack.Navigator initialRouteName="Home"
+                screenOptions={{
+                    headerStyle: {
+                        backgroundColor: '#38A6E3',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }}>
+                <Stack.Screen name="Menu" component={Home} />
                 <Stack.Screen name="Configuracion" component={Settings} />
-                <Stack.Screen name="Scanner" component={BarcodeScanner} />
-                <Stack.Screen name="Preview" component={Preview} />
+                <Stack.Screen name="Escanear" component={BarcodeScanner} />
+                <Stack.Screen name="Visualizacion" component={Preview} />
                 <Stack.Screen name="Manual" component={Manual} />
-                <Stack.Screen name="Verify" component={Verify} />
+                <Stack.Screen name="Editor" component={Editor} />
+                <Stack.Screen name="Verificacion" component={Verify} />
             </Stack.Navigator>
         </NavigationContainer>
     )

@@ -1,8 +1,11 @@
-import { SAVE_DATA_QR, SAVE_LOT_AUTO, SAVE_LOT_MAN,SAVE_PALLET, SCAN_CLEAR } from './action.js';
+import { trimLeft } from '../../helper/functions.js';
+import { QR_CLEAR, SAVE_DATA_QR, SAVE_LOT_AUTO, SAVE_LOT_MAN,SAVE_PALLET, SCAN_CLEAR } from './action.js';
 
 const initialState = {
   pallet: null,
-  lot: null,
+  matCode: null,
+  lotNo: null,
+  qty: null,
   qrPallet: null,
   qrLot: null,
   qrCant: null,
@@ -14,7 +17,7 @@ const barcodeReducer = (state = initialState, action) => {
     case SAVE_PALLET:
       return {
         ...state,
-        pallet: action.payload,
+        pallet: trimLeft(action.payload, '0'),
       };
     case SAVE_LOT_AUTO:
       return {
@@ -32,9 +35,23 @@ const barcodeReducer = (state = initialState, action) => {
       };
     case SCAN_CLEAR:
       return {
+        ...state,
         pallet: null,
-        lot: null,
-        man: false,
+        qrPallet: null,
+        qrLot: null,
+        qrCant: null,
+        qrCodMat: null,
+        matCode: null,
+        lotNo: null,
+        qty:null
+      };
+    case QR_CLEAR:
+      return {
+        ...state,
+        qrPallet: null,
+        qrLot: null,
+        qrCant: null,
+        qrCodMat: null,
       };
     case SAVE_DATA_QR:
       const groups = action.payload.split(String.fromCharCode(29));
@@ -47,7 +64,7 @@ const barcodeReducer = (state = initialState, action) => {
         ...state,
         qrPallet: groups[ix.indexOf('pallet')].split(palletGS).pop(), 
         qrCodMat: groups[ix.indexOf('mat')].split(matGS).pop(),
-        qrLot: groups[ix.indexOf('lot')].split(lotGS).pop(),
+        qrLot: groups[ix.indexOf('lot')].split(lotGS).pop().trim(),
         qrCant: groups[ix.indexOf('qty')].split(qtyGS).pop(),
       };
     default:

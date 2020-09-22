@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, NativeModules, Alert } from 'react-native';
-import {
-    Colors,
-} from 'react-native/Libraries/NewAppScreen';
-import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
+import React, { useState } from 'react';
+import { NativeModules, StyleSheet, View } from 'react-native';
+import { Button, Card, Text } from 'react-native-elements';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import {
+    Colors
+} from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
 import { UPDATE_STORAGE } from './action';
 const Settings = (props) => {
-
     const { navigation } = props;
     const [devices, setDevices] = useState([]);
     const dispatch = useDispatch();
 
-    const selectedDevices = (address,name) => {
+    const selectedDevices = (address, name) => {
         try {
-        const test = { name: name, macAddress: address }
-        const jsonTest = JSON.stringify(test);
+            const test = { name: name, macAddress: address }
+            const jsonTest = JSON.stringify(test);
             AsyncStorage.setItem(
                 '@storage_print',
                 jsonTest
@@ -30,23 +30,32 @@ const Settings = (props) => {
     }
 
     return (
-        <ScrollView>
-            <View>
-                <View style={{ padding: 10, backgroundColor: Colors.white }}>
-                    <Button
-                        title={"Listar dispositivos"}
-                        onPress={() => {
-                            NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                                setDevices(res);
-                            });
-                        }}
-                    ></Button>
-                </View>
-                {devices.length > 0 && <View>
-                    <Text>Seleccione la impresora que va a utilizar para imprimir</Text>
-                </View>}
-                {
-                    devices.map((device) =>
+        <View style={styles.body}>
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                    <View style={{ padding: 10 }}>
+                        <Button title="Editar ZPL" onPress={() => navigation.navigate('Editor')} />
+                    </View>
+                    <View style={{ padding: 10, backgroundColor: Colors.white }}>
+                        <Button
+                            title={"Listar dispositivos"}
+                            onPress={() => {
+                                NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
+                                    setDevices(res);
+                                });
+                            }}
+                        ></Button>
+                    </View>
+                    {devices.length > 0 && <View>
+                        <Text h4 style={{ paddingLeft: 15 }}>Seleccione la impresora</Text>
+                    </View>}
+                    </>
+                }
+                data={devices}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={(item) =>
+                    <Card key={item["index"]}>
                         <View style={{
                             backgroundColor: Colors.white,
                             flexDirection: 'column',
@@ -56,25 +65,32 @@ const Settings = (props) => {
                             <View style={{
                                 flex: 0.4
                             }}>
-                                <Text>{device.name}</Text>
+                                <Text>Nombre: {item["item"].name}</Text>
                             </View>
                             <View style={{
                                 flex: 0.3
                             }}>
-                                <Text>{device.address}</Text>
+                                <Text>MAC: {item["item"].address}</Text>
                             </View>
                             <View style={{ paddingTop: 10 }}>
                                 <Button
                                     title="Conectarme con el dispositivo"
-                                    onPress={() => selectedDevices(device.address,device.name)}
+                                    onPress={() => selectedDevices(item["item"].address, item["item"].name)}
                                 />
                             </View>
                         </View>
-                    )}
-            </View>
-
-        </ScrollView>
+                    </Card>
+                }
+            />
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    body: {
+        backgroundColor: Colors.white,
+        height: "100%"
+    },
+});
 
 export default Settings;

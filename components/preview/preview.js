@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux';
-import { TextInput, StyleSheet, Button, Alert, View, ActivityIndicator, Image, NativeModules, Text } from 'react-native';
-import useScannerStorage from '../home/hooks/useScannerStorage';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { SCAN_CLEAR } from '../scanner/action';
-import { useGetZPL } from './zpl';
 import AsyncStorage from '@react-native-community/async-storage';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, NativeModules, StyleSheet, View, Image } from 'react-native';
+import { Button, Text } from 'react-native-elements';
+import { useDispatch } from 'react-redux';
+import useScannerStorage from '../home/hooks/useScannerStorage';
+import { SCAN_CLEAR } from '../scanner/action';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { Print, Patodebug } from '../../images';
+import ShowDataInInputs from './ShowDataInInputs';
+import useZPLFile from '../editor/hooks/useZPLFile';
+// import { useGetZPL } from './zpl';
 
 const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
     return (
@@ -23,7 +24,7 @@ const Preview = ({ navigation, route }) => {
     const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
+    const zplMgr = useZPLFile();
 
     const print = () => {
         dispatch({ type: SCAN_CLEAR });
@@ -32,10 +33,19 @@ const Preview = ({ navigation, route }) => {
             'Enviando datos a la impresora',
             [{
                 text: 'Continuar', onPress: () => {
-                    NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
-                        navigation.goBack()
-                    }).catch(() => {
-                        Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
+                    zplMgr.getZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode).then((zpl) => {
+                        NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
+                            navigation.goBack()
+                        }).catch(() => {
+                            Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
+                                text: 'Aceptar',
+                                onPress: () => {
+                                    navigation.popToTop();
+                                }
+                            }]);
+                        })
+                    }).catch((error) => {
+                        Alert.alert('Error en ZPL', 'El código de la etiqueta no pudo ser procesado - asegúrese que todos los campos (tags) son válidos', [{
                             text: 'Aceptar',
                             onPress: () => {
                                 navigation.popToTop();
@@ -48,44 +58,46 @@ const Preview = ({ navigation, route }) => {
         );
     }
 
-    const printDebug = () => {
-        setPrinting(true);
-        dispatch({ type: SCAN_CLEAR });
-        Alert.alert('Imprimiendo...',
-            'Enviando datos a la impresora',
-            [{
-                text: 'Continuar', onPress: () => {
-                    navigation.goBack();
-                    setPrinting(false);
-                }
-            }]
-        );
-    }
-
     useEffect(() => {
         AsyncStorage.getItem('@storage_print').then((json) => {
             const value = JSON.parse(json);
             setDevice(value);
         });
+        return (() => {
+            setDevice({})
+        })
     }, []);
 
     return (
         <ScrollView styles={styles.container}>
-            <Text styles={styles.text}>
+            <Text h4 style={{ paddingLeft: 15, paddingTop: 2 }}>
                 Datos leidos
             </Text>
-            <TextInput style={styles.field} editable={false} value={scanner.pallet} />
-            <TextInput style={styles.field} editable={false} value={scanner.lotNo} />
-            <TextInput style={styles.field} editable={false} value={scanner.qty} />
-            <TextInput style={styles.field} editable={false} value={scanner.matCode} />
-
+            <View>
+                <ShowDataInInputs pallet={scanner.pallet} matCode={scanner.matCode} lotNo={scanner.lotNo} qty={scanner.qty} />
+            </View>
             <View style={styles.buttonContainer}>
                 {
                     !validate ? <View style={styles.buttonContainer} >
-                        <ImageButton style={[styles.button, styles.buttonPrint]} onPress={() => print()} disabled={printing} imgStyle={styles.image} source={Print}/>
-                        <ImageButton style={[styles.button, styles.buttonDebug]} onPress={() => printDebug()} imgStyle={styles.image} source={Patodebug}/>
+                        <View style={{ width: "50%",paddingRight: 20  }}>
+                            <Button
+                                buttonStyle={{ backgroundColor: '#DB3834' }}
+                                title={"Cancelar"} onPress={() => {
+                                    dispatch({ type: SCAN_CLEAR })
+                                    navigation.goBack();
+                                }} />
+                        </View>
+                        <View style={{ width: "45%"}}>
+                            <Button title={"Imprimir"}
+                                buttonStyle={{ backgroundColor: '#00C18A' }}
+                                onPress={print} />
+                        </View>
                     </View>
-                        : <Button title={"Validar con QR"} onPress={() => navigation.navigate("Scanner", {validate:false, type:"qr"})}/>
+                        : <View style={{ width: "80%" }}>
+                            <Button title={"Validar con QR"}
+                                buttonStyle={{ backgroundColor: '#00C18A' }}
+                                onPress={() => navigation.navigate("Escanear", { validate: false, type: "qr" })} />
+                        </View>
                 }
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
@@ -101,21 +113,13 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
     },
-    text: {
+    textView: {
+        paddingLeft: 10,
         fontSize: 20,
-    },
-    field: {
-        margin: "5%",
-        backgroundColor: "#cedee0",
-        height: 100,
-        borderRadius: 20,
-        fontFamily: "Helvetica, Arial, sans-serif;",
-        paddingHorizontal: 25,
-        marginBottom: 15,
-        fontSize: 20,
-        color: Colors.black,
+        paddingBottom: 10
     },
     buttonContainer: {
+        paddingTop: 5,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
@@ -127,19 +131,6 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOpacity: 1,
         shadowRadius: 5,
-    },
-    buttonDebug: {
-        borderColor: '#fafafa', 
-        marginLeft: 20, 
-        backgroundColor: 'white',
-    },
-    buttonPrint: {
-        backgroundColor: '#2DCC70',
-    },
-    image: {
-        width: 60,
-        height: 60,
-        margin: 10,
     },
 })
 
