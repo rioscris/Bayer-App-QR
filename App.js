@@ -6,14 +6,21 @@
  * @flow strict-local
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navigation from './navigation/navigation';
 import { Provider } from 'react-redux';
 import configureStore from './storeConfig/configureStore';
+import useZPLFile from './components/editor/hooks/useZPLFile'
 
 let store = configureStore();
 
 const App = (props) => {
+  const fileMgr = useZPLFile();
+
+  useEffect(() => {
+    fileMgr.initFile();
+  })
+  
   return (
     <Provider store={store}>
       <Navigation />

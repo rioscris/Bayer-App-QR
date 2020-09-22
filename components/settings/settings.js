@@ -30,53 +30,59 @@ const Settings = (props) => {
     }
 
     return (
-        <ScrollView>
-            <View style={styles.body}>
-                <View style={{ padding: 10, backgroundColor: Colors.white }}>
-                    <Button
-                        title={"Listar dispositivos"}
-                        onPress={() => {
-                            NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                                setDevices(res);
-                            });
-                        }}
-                    ></Button>
-                </View>
-                {devices.length > 0 && <View>
-                    <Text h4 style={{ paddingLeft: 15 }}>Seleccione la impresora</Text>
-                </View>}
-                <FlatList
-                    data={devices}
-                    renderItem={(item) =>
-                        <Card key={item["index"]}>
+        <View style={styles.body}>
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                    <View style={{ padding: 10 }}>
+                        <Button title="Editar ZPL" onPress={() => navigation.navigate('Editor')} />
+                    </View>
+                    <View style={{ padding: 10, backgroundColor: Colors.white }}>
+                        <Button
+                            title={"Listar dispositivos"}
+                            onPress={() => {
+                                NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
+                                    setDevices(res);
+                                });
+                            }}
+                        ></Button>
+                    </View>
+                    {devices.length > 0 && <View>
+                        <Text h4 style={{ paddingLeft: 15 }}>Seleccione la impresora</Text>
+                    </View>}
+                    </>
+                }
+                data={devices}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={(item) =>
+                    <Card key={item["index"]}>
+                        <View style={{
+                            backgroundColor: Colors.white,
+                            flexDirection: 'column',
+                            padding: 20,
+                            justifyContent: 'center'
+                        }}>
                             <View style={{
-                                backgroundColor: Colors.white,
-                                flexDirection: 'column',
-                                padding: 20,
-                                justifyContent: 'center'
+                                flex: 0.4
                             }}>
-                                <View style={{
-                                    flex: 0.4
-                                }}>
-                                    <Text>Nombre: {item["item"].name}</Text>
-                                </View>
-                                <View style={{
-                                    flex: 0.3
-                                }}>
-                                    <Text>MAC: {item["item"].address}</Text>
-                                </View>
-                                <View style={{ paddingTop: 10 }}>
-                                    <Button
-                                        title="Conectarme con el dispositivo"
-                                        onPress={() => selectedDevices(item["item"].address, item["item"].name)}
-                                    />
-                                </View>
+                                <Text>Nombre: {item["item"].name}</Text>
                             </View>
-                        </Card>
-                    }
-                />
-            </View>
-        </ScrollView>
+                            <View style={{
+                                flex: 0.3
+                            }}>
+                                <Text>MAC: {item["item"].address}</Text>
+                            </View>
+                            <View style={{ paddingTop: 10 }}>
+                                <Button
+                                    title="Conectarme con el dispositivo"
+                                    onPress={() => selectedDevices(item["item"].address, item["item"].name)}
+                                />
+                            </View>
+                        </View>
+                    </Card>
+                }
+            />
+        </View>
     )
 }
 

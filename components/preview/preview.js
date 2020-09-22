@@ -7,7 +7,8 @@ import useScannerStorage from '../home/hooks/useScannerStorage';
 import { SCAN_CLEAR } from '../scanner/action';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ShowDataInInputs from './ShowDataInInputs';
-import { useGetZPL } from './zpl';
+import useZPLFile from '../editor/hooks/useZPLFile';
+// import { useGetZPL } from './zpl';
 
 const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
     return (
@@ -23,7 +24,7 @@ const Preview = ({ navigation, route }) => {
     const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
-    const zpl = useGetZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode);
+    const zplMgr = useZPLFile();
 
     const print = () => {
         dispatch({ type: SCAN_CLEAR });
@@ -32,10 +33,20 @@ const Preview = ({ navigation, route }) => {
             'Enviando datos a la impresora',
             [{
                 text: 'Continuar', onPress: () => {
-                    NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
-                        navigation.goBack()
-                    }).catch(() => {
-                        Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
+                    zplMgr.getZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode).then((zpl) => {
+                        console.log(zpl)
+                        NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
+                            navigation.goBack()
+                        }).catch(() => {
+                            Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
+                                text: 'Aceptar',
+                                onPress: () => {
+                                    navigation.popToTop();
+                                }
+                            }]);
+                        })
+                    }).catch((error) => {
+                        Alert.alert('Error en ZPL', 'El código de la etiqueta no pudo ser procesado - asegúrese que todos los campos (tags) son válidos', [{
                             text: 'Aceptar',
                             onPress: () => {
                                 navigation.popToTop();

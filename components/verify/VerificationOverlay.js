@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Overlay, Text } from 'react-native-elements';
+import { Button, Overlay, Text, Icon } from 'react-native-elements';
 import { SCAN_CLEAR } from '../scanner/action';
+import EntypoIcon from 'react-native-vector-icons/Entypo'
 
-const VerificationOverlay = ({ setVisible, visible, verification,navigation,dispatch }) => {
+const VerificationOverlay = ({ setVisible, visible, verification, navigation, dispatch }) => {
 
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -11,18 +12,21 @@ const VerificationOverlay = ({ setVisible, visible, verification,navigation,disp
 
     return (
         <View >
-            <Overlay overlayStyle={{height:"32%",width:"92%"}} isVisible={visible} onBackdropPress={toggleOverlay} >
-                {verification === true ? <VerificationOk /> : <VerificationBad />}
-                <View style={styles.buttonContainer}>
-                    <View style={{width:"35%"}}>
-                        <Button title={"Ver datos"} onPress={toggleOverlay}/>
-                    </View>
-                    <View style={{paddingLeft:20,width:"40%"}}>
-                        <Button title={"Finalizar"} 
-                        buttonStyle={{backgroundColor:'#00C18A'}}
-                        onPress={() => {  
-                            dispatch({type:SCAN_CLEAR})
-                            navigation.navigate("Menu")}}/>
+            <Overlay overlayStyle={{ height: "50%" }} isVisible={visible} onBackdropPress={toggleOverlay} animationType={"fade"} >
+                <View style={{ height: '100%', flexDirection: "column", justifyContent: "space-evenly", padding: 10 }}>
+                    {verification === true ? <VerificationOk /> : <VerificationBad />}
+                    <View style={styles.buttonContainer}>
+                        <View style={{ width: "35%" }}>
+                            <Button title={"Ver datos"} onPress={toggleOverlay} />
+                        </View>
+                        <View style={{ paddingLeft: 20, width: "40%" }}>
+                            <Button title={"Finalizar"}
+                                buttonStyle={{ backgroundColor: '#00C18A' }}
+                                onPress={() => {
+                                    dispatch({ type: SCAN_CLEAR })
+                                    navigation.navigate("Menu")
+                                }} />
+                        </View>
                     </View>
                 </View>
             </Overlay>
@@ -32,23 +36,25 @@ const VerificationOverlay = ({ setVisible, visible, verification,navigation,disp
 
 const VerificationOk = () => (
     <View>
-        <Text h4 style={{paddingLeft:"10%"}}>
-            ¡Validación exitosa!
-        </Text>
-        <Text style={{fontSize:20,paddingLeft:"10%",paddingTop:30}}>
-            El código de barra coincide con el código QR leído.
-        </Text>
+        <Icon name='check-circle' type='feather' color='#00C18A' size={100} />
+        <View style={{ alignContent: 'center', flexDirection: "column", justifyContent: "center" }}>
+            <View style={{ alignContent: 'center', flexDirection: "row", justifyContent: "center" }}>
+                <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#9C9C9C', paddingTop: 20 }}>¡Validación exitosa!</Text>
+            </View>
+        </View>
     </View>
 )
 
 const VerificationBad = () => (
     <View>
-        <Text h4 style={{paddingLeft:"10%"}}>
-            Validación fallida
-        </Text>
-        <Text style={{fontSize:20,paddingLeft:"10%",paddingTop:30}}>
-            Los valores de las etiquetas no coinciden.
-        </Text>
+        <View style={{paddingLeft:"32%"}}>
+        <EntypoIcon name='circle-with-cross' type='feather' color='#DB3834' size={100}/>
+        </View>
+        <View style={{ alignContent: 'center', flexDirection: "column", justifyContent: "center" }}>
+            <View style={{ alignContent: 'center', flexDirection: "row", justifyContent: "center" }}>
+                <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#9C9C9C', paddingTop: 20 }}>Validación fallida</Text>
+            </View>
+        </View>
     </View>
 )
 
@@ -57,7 +63,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
-        paddingTop:"15%",
     },
 })
 

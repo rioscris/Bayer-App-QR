@@ -10,6 +10,7 @@ import BarcodeScanner from '../components/scanner/barcode/barcodeScanner'
 import Preview from '../components/preview/preview';
 import Manual from '../components/manual/manual';
 import Verify from '../components/verify/verify';
+import Editor from '../components/editor/editor';
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,7 @@ const Navigation = () => {
                 <Stack.Screen name="Escanear" component={BarcodeScanner} />
                 <Stack.Screen name="Visualizacion" component={Preview} />
                 <Stack.Screen name="Manual" component={Manual} />
+                <Stack.Screen name="Editor" component={Editor} />
                 <Stack.Screen name="Verificacion" component={Verify} />
             </Stack.Navigator>
         </NavigationContainer>
