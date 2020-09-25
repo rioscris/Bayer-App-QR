@@ -16,10 +16,10 @@ const VerificationOverlay = ({ setVisible, visible, verification, navigation, di
                 <View style={{ height: '100%', flexDirection: "column", justifyContent: "space-evenly", padding: 10 }}>
                     {verification === true ? <VerificationOk /> : <VerificationBad />}
                     <View style={styles.buttonContainer}>
-                        <View style={{ width: "35%" }}>
+                        <View style={{ width: "40%" }}>
                             <Button title={"Ver datos"} onPress={toggleOverlay} />
                         </View>
-                        <View style={{ paddingLeft: 20, width: "40%" }}>
+                        <View style={{ paddingLeft: 20, width: "50%" }}>
                             <Button title={"Finalizar"}
                                 buttonStyle={{ backgroundColor: '#00C18A' }}
                                 onPress={() => {

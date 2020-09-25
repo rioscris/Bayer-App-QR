@@ -28,12 +28,12 @@ const Navigation = () => {
                     },
                 }}>
                 <Stack.Screen name="Menu" component={Home} />
-                <Stack.Screen name="Configuracion" component={Settings} />
+                <Stack.Screen name="Configuración" component={Settings} />
                 <Stack.Screen name="Escanear" component={BarcodeScanner} />
-                <Stack.Screen name="Visualizacion" component={Preview} />
+                <Stack.Screen name="Visualización" component={Preview} />
                 <Stack.Screen name="Manual" component={Manual} />
                 <Stack.Screen name="Editor" component={Editor} />
-                <Stack.Screen name="Verificacion" component={Verify} />
+                <Stack.Screen name="Verificación" component={Verify} />
             </Stack.Navigator>
         </NavigationContainer>
     )

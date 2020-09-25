@@ -1,4 +1,5 @@
 import React,{useEffect, useState} from 'react'
+import { numberChangeFormat } from '../../../helper/functions'
 
 const useGetVerifiedData = (scanner) => {
     const [equalPallet,setEqualPallet] = useState(false)
@@ -6,6 +7,8 @@ const useGetVerifiedData = (scanner) => {
     const [equalLotNo,setEqualLotNo] = useState(false)
     const [equalQty,setEqualQty] = useState(false)
     const [verification,setVerification] = useState(false)
+
+    const qtyToEnglish = numberChangeFormat(scanner.qty)
 
     useEffect(() => {
         if (scanner.qrPallet === scanner.pallet){
@@ -20,11 +23,11 @@ const useGetVerifiedData = (scanner) => {
             setEqualLotNo(true)
         }
     
-        if (scanner.qrCant === scanner.qty){
+        if (qtyToEnglish === scanner.qrCant){
             setEqualQty(true)
         }
 
-        if( scanner.qrPallet === scanner.pallet && scanner.qrCodMat === scanner.matCode && scanner.qrLot === scanner.lotNo && scanner.qrCant === scanner.qty)
+        if( scanner.qrPallet === scanner.pallet && scanner.qrCodMat === scanner.matCode && scanner.qrLot === scanner.lotNo && qtyToEnglish === scanner.qrCant)
             setVerification(true)
     },[])
 

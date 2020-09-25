@@ -1,22 +1,14 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, NativeModules, StyleSheet, View, Image } from 'react-native';
+import { ActivityIndicator, Alert, NativeModules, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
+import { Popup } from '../../helper/components';
+import useZPLFile from '../editor/hooks/useZPLFile';
 import useScannerStorage from '../home/hooks/useScannerStorage';
 import { SCAN_CLEAR } from '../scanner/action';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ShowDataInInputs from './ShowDataInInputs';
-import useZPLFile from '../editor/hooks/useZPLFile';
-// import { useGetZPL } from './zpl';
-
-const ImageButton = (tchStyle, onPress, source, imgStyle, disabled) => {
-    return (
-        <TouchableOpacity style={tchStyle} onPress={onPress} disabled={disabled}>
-            <Image style={imgStyle} source={source} />
-        </TouchableOpacity>
-    )
-}
 
 const Preview = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -24,38 +16,24 @@ const Preview = ({ navigation, route }) => {
     const { validate } = route.params;
     const [printing, setPrinting] = useState(false);
     const [device, setDevice] = useState({});
+    const [popup, setPopup] = useState({visible: false, title: '', type: '', text: '', confirm: false});
     const zplMgr = useZPLFile();
 
     const print = () => {
         dispatch({ type: SCAN_CLEAR });
         setPrinting(true);
-        Alert.alert('Imprimiendo...',
-            'Enviando datos a la impresora',
-            [{
-                text: 'Continuar', onPress: () => {
-                    zplMgr.getZPL(scanner.pallet, scanner.lotNo, scanner.qty, scanner.matCode).then((zpl) => {
-                        NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
-                            navigation.goBack()
-                        }).catch(() => {
-                            Alert.alert('Error de conexión', 'Ha ocurrido un error al imprimir', [{
-                                text: 'Aceptar',
-                                onPress: () => {
-                                    navigation.popToTop();
-                                }
-                            }]);
-                        })
-                    }).catch((error) => {
-                        Alert.alert('Error en ZPL', 'El código de la etiqueta no pudo ser procesado - asegúrese que todos los campos (tags) son válidos', [{
-                            text: 'Aceptar',
-                            onPress: () => {
-                                navigation.popToTop();
-                            }
-                        }]);
-                    })
-                    setPrinting(false);
-                }
-            }]
-        );
+        setPopup({visible:true, title:"Imprimiendo...", text:"Enviando datos a la impresora", type:'', confirm:false})
+        zplMgr.getZPL(scanner.pallet, scanner.matCode, scanner.lotNo, scanner.qty).then((zpl) => {
+            NativeModules.RNZebraBluetoothPrinter.print(device.macAddress, zpl).then((res) => {
+                setPopup({visible:false, title:'', text:'', confirm:false, type: ''})
+                navigation.popToTop()
+            }).catch(() => {
+                setPopup({visible:true, title:"Error de conexión", type:"rejected", text:"Ha ocurrido un error al imprimir. Revise la conexión con la impresora.", confirm:true});
+            })
+        }).catch((error) => {
+            setPopup({visible:true, title:"Error en ZPL", type:"rejected", text:"El código de la etiqueta no pudo ser procesado - asegúrese que todos los campos (tags) son válidos", confirm:true})
+        })
+        setPrinting(false);
     }
 
     useEffect(() => {
@@ -70,8 +48,8 @@ const Preview = ({ navigation, route }) => {
 
     return (
         <ScrollView styles={styles.container}>
-            <Text h4 style={{ paddingLeft: 15, paddingTop: 2 }}>
-                Datos leidos
+            <Text h4 style={{ paddingLeft: 15, paddingTop: 10 }}>
+                Datos leídos
             </Text>
             <View>
                 <ShowDataInInputs pallet={scanner.pallet} matCode={scanner.matCode} lotNo={scanner.lotNo} qty={scanner.qty} />
@@ -99,6 +77,10 @@ const Preview = ({ navigation, route }) => {
                                 onPress={() => navigation.navigate("Escanear", { validate: false, type: "qr" })} />
                         </View>
                 }
+            <Popup visible={popup.visible} title={popup.title} text={popup.text} type={popup.type} width={'80%'} onPress={popup.confirm ? () => {
+                setPopup({visible:false,title:'',text:'',confirm:false,type: ''})
+                navigation.popToTop()
+                } : null}/>
             </View>
             {printing && <ActivityIndicator size='large' color='#00ff00' />}
         </ScrollView>
@@ -120,6 +102,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         paddingTop: 5,
+        paddingBottom: 10,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",

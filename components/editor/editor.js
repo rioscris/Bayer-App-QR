@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Button, Card, Input, Text } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useDispatch } from 'react-redux';
-import { Input, Text, Card, Button, ButtonGroup, Overlay, Icon } from 'react-native-elements';
-import useZPLFile from './hooks/useZPLFile';
+import { Popup } from '../../helper/components';
 import { TAGS, ZPL_DEFAULT } from '../preview/zpl';
+import useZPLFile from './hooks/useZPLFile';
 
 const Table = ({content}) => {
     return (
@@ -26,23 +26,6 @@ const Table = ({content}) => {
             </View>
         )}
     </View>
-    )
-}
-
-const SavedPopup = ({visible}) => {
-    return (
-        <Overlay isVisible={visible} animationType={"fade"} overlayStyle={{height: '50%'}}>
-            <View style={{height: '100%', flexDirection: "column", justifyContent: "space-evenly", padding: 10}}>
-                <Icon name='check-circle' type='feather' color='#00C18A' size={100}/>
-                <View style={{alignContent: 'center', flexDirection: "column", justifyContent: "center"}}>
-                    <View style={{alignContent: 'center', flexDirection: "row", justifyContent: "center"}}>
-                        <Text style={{fontSize: 21, fontWeight: 'bold', color: '#9C9C9C'}}>¡Guardado!</Text>
-                    </View>
-                    <Text style={{fontSize: 18, color: '#757575'}}>Ahora utilizaremos este código</Text>
-                </View>
-                <ActivityIndicator size={"large"} color={'#1976D2'}/>
-            </View>
-        </Overlay>
     )
 }
 
@@ -79,7 +62,7 @@ const Editor = ({ navigation }) => {
     const restoreZPL = () => {
         setText(ZPL_DEFAULT)
     }
-    
+
     const checkValid = () => {
         if(text.includes(TAGS.PALLET) && text.includes(TAGS.MATCODE) && text.includes(TAGS.LOTNO) && text.includes(TAGS.QTY)){
             setSaved(true);
@@ -118,7 +101,7 @@ const Editor = ({ navigation }) => {
                     <Button title="Guardar" onPress={() => checkValid()} disabled={!changes} buttonStyle={{backgroundColor:'#00C18A'}} />
                 </View>
             </View>
-            <SavedPopup visible={saved}/>
+            <Popup visible={saved} title={'¡Guardado!'} type={'approved'} text={'Ahora utilizaremos este código'}/>
         </ScrollView>
     )
 }

@@ -9,7 +9,7 @@ const ShowCompareInputs = ({ scanner, equalPallet, equalMatCode, equalLotNo, equ
     return (
         <Card>
             <Text style={styles.textView}>
-                Numero de paleta
+                Número de paleta
             </Text>
             <Card.Divider />
             <Input leftIcon={<AntDesignIcon name={"barcode"} size={20}/>} value={scanner.pallet} disabled={true}
@@ -21,7 +21,7 @@ const ShowCompareInputs = ({ scanner, equalPallet, equalMatCode, equalLotNo, equ
                     : <EntypoIcon name={"circle-with-cross"} size={25} color="red" />}
             />
             <Text style={styles.textView}>
-                Codigo de material
+                Código de material
             </Text>
             <Card.Divider />
             <Input leftIcon={<AntDesignIcon name={"barcode"} size={20}/>} value={scanner.matCode} disabled={true}

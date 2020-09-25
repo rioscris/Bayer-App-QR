@@ -5,3 +5,4 @@ export {default as Camera} from './camera.png';
 export {default as Print} from './print.png';
 export {default as TorchOn} from './torch_on.png';
 export {default as TorchOff} from './torch_off.png';
+export {default as Settings} from './settings.png';

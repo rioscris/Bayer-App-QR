@@ -4,3 +4,6 @@ export const trimLeft = (str, charlist) => {
 
   return str.replace(new RegExp("^[" + charlist + "]+"), "");
 };
+
+
+export const numberChangeFormat = (str) => str.replace(/[,.]/g, (m) => (m === "," ? "." : ''));

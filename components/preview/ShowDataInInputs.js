@@ -6,12 +6,12 @@ const ShowDataInInputs = ({pallet,matCode,lotNo,qty}) => {
     return (
         <Card >
             <Text style={styles.textView}>
-                Numero de paleta
+                Número de paleta
                     </Text>
             <Card.Divider />
             <Input value={pallet} disabled={true} />
             <Text style={styles.textView}>
-                Codigo de material
+                Código de material
                     </Text>
             <Card.Divider />
             <Input value={matCode} disabled={true} />

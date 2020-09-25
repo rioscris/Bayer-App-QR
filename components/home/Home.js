@@ -11,6 +11,7 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
+import { SCAN_CLEAR } from '../scanner/action';
 import { UPDATE_STORAGE } from '../settings/action';
 import useUpdateStorage from './hooks/useUpdateStorage';
 
@@ -36,7 +37,7 @@ const Home = (props) => {
         navigation.setOptions({
             headerRight: () => (
                 <TouchableOpacity style={{ paddingRight: 20 }}>
-                    <AntDesignIcon name='setting' size={30} color="white" onPress={() => navigation.navigate('Configuracion')} />
+                    <AntDesignIcon name='setting' size={30} color="white" onPress={() => navigation.navigate('Configuración')} />
                 </TouchableOpacity>
             ),
         });
@@ -81,10 +82,16 @@ const Home = (props) => {
                         </View>
                         <View style={{ padding: 10, backgroundColor: Colors.white }}>
                             <View >
-                                <Button title="Generar codigo QR" onPress={() => navigation.navigate('Escanear', { validate: false, type: "barcode" })} disabled={device.macAddress === 0} />
+                                <Button title="Generar código QR" onPress={() => {
+                                    dispatch({ type: SCAN_CLEAR })
+                                    navigation.navigate('Escanear', { validate: false, type: "barcode" })
+                                }} disabled={device.macAddress === 0} />
                             </View>
                             <View style={{ paddingTop: 10 }}>
-                                <Button title="Validar codigo QR" onPress={() => navigation.navigate('Escanear', { validate: true, type: "barcode" })} disabled={device.macAddress === 0}/>
+                                <Button title="Validar código QR" onPress={() => {
+                                    dispatch({ type: SCAN_CLEAR })
+                                    navigation.navigate('Escanear', { validate: true, type: "barcode" })
+                                }} disabled={device.macAddress === 0} />
                             </View>
                             {/* <TouchableOpacity onPress={() => setDebug(!debug)} style={{ paddingLeft: "40%", paddingTop: 10 }}>
                                 <View>

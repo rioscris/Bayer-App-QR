@@ -7,11 +7,13 @@ import {
     Colors
 } from 'react-native/Libraries/NewAppScreen';
 import { useDispatch } from 'react-redux';
+import { Popup } from '../../helper/components';
 import { UPDATE_STORAGE } from './action';
 const Settings = (props) => {
     const { navigation } = props;
     const [devices, setDevices] = useState([]);
     const dispatch = useDispatch();
+    const [popup, setPopup] = useState({visible: false, title: '', type: '', text: '', confirm: false});
 
     const selectedDevices = (address, name) => {
         try {
@@ -22,10 +24,10 @@ const Settings = (props) => {
                 jsonTest
             );
             dispatch({ type: UPDATE_STORAGE, payload: true })
-            alert("Se a conectado a la impresora con exito")
+            setPopup({visible: true, title: 'Se a conectado a la impresora con exito', type: 'approved', confirm: false});
             navigation.goBack();
         } catch (error) {
-            alert("Se ha producido un error al querer conectarse con la impresora, verifique que el dispositivo se encuentra emparejado o encendido" + error)
+            setPopup({visible: true, title: 'Error al conectarse con la impresora',text:"Por favor, verifique que el dispositivo se encuentra emparejado o encendido" + error,type: 'rejected', confirm: true});
         }
     }
 
@@ -82,6 +84,7 @@ const Settings = (props) => {
                     </Card>
                 }
             />
+            <Popup visible={popup.visible} title={popup.title} text={popup.text} type={popup.type} width={'80%'} onPress={popup.confirm ? () => setPopup({visible: false, title: '', type: '', text: '', confirm: false}) : null}/>
         </View>
     )
 }

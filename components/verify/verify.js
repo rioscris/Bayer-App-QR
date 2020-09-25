@@ -21,7 +21,6 @@ const Verify = ({ navigation }) => {
         })
     }, [])
 
-
     return (
         <ScrollView>
             <View styles={styles.container}>
@@ -29,8 +28,8 @@ const Verify = ({ navigation }) => {
             </View>
             <VerificationOverlay setVisible={setVisible} visible={visible} verification={verification} navigation={navigation} dispatch={dispatch}/>
             <View style={styles.buttonContainer}>
-                <View style={{ width: "80%", paddingTop: 10,paddingBottom:10 }}>
-                    <Button title="Volver" onPress={() => navigation.popToTop()} />
+                <View style={{ width: "80%", paddingTop: 10, paddingBottom:10 }}>
+                    <Button title="Volver al menu principal" onPress={() => navigation.popToTop()} />
                 </View>
             </View>
         </ScrollView>

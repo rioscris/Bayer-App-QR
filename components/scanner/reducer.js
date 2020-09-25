@@ -24,7 +24,7 @@ const barcodeReducer = (state = initialState, action) => {
         ...state,
         matCode: action.payload.slice(0, 8), ///12345678  ABCDEF  1234
         lotNo: action.payload.slice(8, 18).trim().toUpperCase(),
-        qty: action.payload.slice(18),
+        qty: action.payload.slice(18).trim(),
       };
     case SAVE_LOT_MAN:
       return {
@@ -58,7 +58,7 @@ const barcodeReducer = (state = initialState, action) => {
       const palletGS = "92";
       const matGS = "240";
       const lotGS = "10";
-      const qtyGS = "37";
+      const qtyGS = "93";
       const ix = [null, 'pallet', 'mat', 'lot', 'qty']
       return {
         ...state,
