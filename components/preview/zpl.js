@@ -1,0 +1,24 @@
+export const FILE_NAME = 'zpl.txt'
+
+export const TAGS = {
+    PALLET: '[PALLET]',
+    MATCODE: '[MATCODE]',
+    LOTNO: '[LOTNO]',
+    QTY: '[QTY]',
+}
+
+// export const ZPL_DEFAULT =
+// `^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ
+// ^XA
+// ^MMT
+// ^PW799
+// ^LL0519
+// ^LS0
+// ^BY198,198^FT59,241^BXN,9,200,0,0,1,~
+// ^FH\\^FD\\7E192[PALLET]\\7E1240[MATCODE]\\7E110[LOTNO]\\7E193[QTY]^FS
+// ^PQ1,0,1,Y^XZ`;
+
+export const ZPL_DEFAULT =`^XA
+^BY198,198^FT59,241^BXN,9,200,0,0,1,~
+^FH\\^FD\\7E192[PALLET]\\7E1240[MATCODE]\\7E110[LOTNO]\\7E193[QTY]^FS
+^PQ1,0,1,Y^XZ`;

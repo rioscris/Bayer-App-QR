@@ -1,2 +1,2 @@
 # ELector
-Aplicacion mobile de lectura e impresion de etiquetas con codigo QR/Barra
+Aplicacion mobile de lectura e impresion de etiquetas con código QR/Barra
