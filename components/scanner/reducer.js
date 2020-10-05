@@ -55,7 +55,7 @@ const barcodeReducer = (state = initialState, action) => {
       };
     case SAVE_DATA_QR:
       const groups = action.payload.split(String.fromCharCode(29));
-      const palletGS = "92";
+      const palletGS = "91";
       const matGS = "240";
       const lotGS = "10";
       const qtyGS = "93";
